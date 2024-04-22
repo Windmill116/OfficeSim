@@ -31,8 +31,8 @@ public class Parser{
         
         return line;
     }
-
-
+    
+    
     public int workflowTokenizer(){
         String line = readLine();
         while(line != null){
@@ -71,6 +71,16 @@ public class Parser{
     public ArrayList<String> getTokens() {
         return tokens;
     }
+
+    public int getCurrentDepth() {
+        return currentDepth;
+    }
+
+    public void setCurrentDepth(int currentDepth) {
+        this.currentDepth = currentDepth;
+    }
+    
+    
 
 
 
