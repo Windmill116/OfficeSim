@@ -5,8 +5,7 @@ import java.util.ArrayList;
 import Parser.Parser;
 public class Test {
     public static void main(String[] args) {
-        try { //It's apperant that the code was NOT written by the Communist of the group,
-                //Because it separates the lines.
+        try {
             FileReader fr = new FileReader("test.txt");
             Parser p = new Parser(fr);
             p.workflowTokenizer();
