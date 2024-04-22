@@ -87,7 +87,8 @@ public class Organizer {
                    try {
                             
                     float val = (float)Double.parseDouble(tokens.get(i));
-                    jobs.getLast().getTasks().getLast().setValue(val);
+                    ArrayList<Task> ts = jobs.get(jobs.size()-1).getTasks();
+                    ts.get(ts.size()-1).setValue(val);
                        
                         
                     } catch (NumberFormatException e) {
@@ -140,13 +141,14 @@ public class Organizer {
                     try {
                             
                        float val = (float)Double.parseDouble(tokens.get(i));
-                       stations.getLast().getTasks().getLast().setValue(val);
+                       ArrayList<Task> ts = stations.get(stations.size()-1).getTasks();
+                       ts.get(ts.size()-1).setValue(val);
                        
                        try {
                            
                            float val2 = (float)Double.parseDouble(tokens.get(i+1));
                           
-                           stations.getLast().setPlusMinus(val2);
+                           stations.get(stations.size()-1).setPlusMinus(val2);
                            
                        } catch (NumberFormatException e) {
                            
