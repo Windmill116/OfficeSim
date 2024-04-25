@@ -2,10 +2,12 @@ package Parser;
 
 public class MyTime {
     private static long t0Milliseconds;
+    private static boolean iDidntKnowWhatToNameThisBoolean;
 
     //the las vegas GP should be replaced with the istanbul GP
 
     public static void waitForSeconds(double seconds){
+        //waits for a specified amount of seconds
         t0Milliseconds=System.currentTimeMillis();
 
         long t1milliseconds=(long)(seconds*1000);
@@ -18,7 +20,8 @@ public class MyTime {
     }
 
     public static void waitForSecondsCountdown(int seconds){
-
+        //this method is for waiting for a certain amount of seconds and counting down until 0 from the 
+        //specified amount of seconds
         for (int i = 0; i < seconds; i++) {
             t0Milliseconds=System.currentTimeMillis();
             System.out.println(seconds-i);
@@ -29,5 +32,22 @@ public class MyTime {
         System.out.println("0");
 
         return;
+    }
+
+    public static boolean waitForSecondsCondition(double seconds){
+        //this method is for use in while loops, to keep a certain while loop running for a
+        //specific amount of time.
+        if(iDidntKnowWhatToNameThisBoolean){
+            if(System.currentTimeMillis()-t0Milliseconds<=(long)(seconds*1000)){
+                return true;
+            } else{
+                iDidntKnowWhatToNameThisBoolean=false;
+                return false;
+            }
+        } else{
+            iDidntKnowWhatToNameThisBoolean=true;
+            t0Milliseconds=System.currentTimeMillis();
+            return true;
+        }
     }
 }
