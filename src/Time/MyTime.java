@@ -1,4 +1,4 @@
-package Parser;
+package Time;
 
 public class MyTime {
     private static long t0Milliseconds;

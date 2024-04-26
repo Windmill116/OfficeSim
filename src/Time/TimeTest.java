@@ -1,4 +1,4 @@
-package Parser;
+package Time;
 
 public class TimeTest {
     public static void main(String[] args) {
