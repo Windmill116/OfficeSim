@@ -6,9 +6,10 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 public class Parser{
-    private int currentDepth;
+    private static int currentDepth;
     private LineNumberReader reader;
     private ArrayList<String> tokens;
+    private ErrorDetector errorDetector;
     /* Gets argument as FileReader and */
     public Parser(FileReader r){
         Locale.setDefault(Locale.ENGLISH);
@@ -35,6 +36,7 @@ public class Parser{
     
     public int workflowTokenizer(){
         String line = readLine();
+        
         while(line != null){
             
             String[] temp = line.split(" ");
@@ -49,9 +51,11 @@ public class Parser{
                     /*If char is (  or ) add another token */
                     if(s2 == '('){
                         tokens.add("(");
+                        
                         continue;
                     }else if(s2 == ')'){
                         currentDepth++;
+                        
                         continue;
                     }
                     tmp.append(s2);
@@ -69,16 +73,13 @@ public class Parser{
     }
 
     public ArrayList<String> getTokens() {
+        
+        this.tokens.removeIf(String::isBlank);
+        
         return tokens;
     }
 
-    public int getCurrentDepth() {
-        return currentDepth;
-    }
-
-    public void setCurrentDepth(int currentDepth) {
-        this.currentDepth = currentDepth;
-    }
+    
     
     
 
