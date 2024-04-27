@@ -39,7 +39,7 @@ public class Organizer {
                }
                if(token.equals(")"))
                {
-                  organizeJobs();
+                  
                   break; 
                } 
                 try {
@@ -74,7 +74,7 @@ public class Organizer {
               if(tokens.get(i).equals(")"))
               {
                   
-                   if(tokens.get(i+4).equals("stations")) 
+                   if(tokens.get(i+3).equals("stations")) // çok kırılgan bir kod dikkat!!
                    {
                        i = i + 4;
                        index = i;

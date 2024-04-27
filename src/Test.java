@@ -1,3 +1,4 @@
+import Parser.ErrorDetector;
 import Parser.Job;
 import java.io.FileReader;
 import java.io.IOException;
@@ -15,34 +16,17 @@ public class Test {
             Parser p = new Parser(fr);
             p.workflowTokenizer();
             ArrayList<String> tokens = p.getTokens();
+            for (String token : tokens) {
+                System.out.println(token);
+            }
+            ErrorDetector errorDetector = new ErrorDetector(tokens);
+            errorDetector.findErrors();
+            
             Organizer organizer = new Organizer(tokens);
             
-            for (Task task : organizer.getTasks()) {
-                
-                System.out.println(task.getName() + " " + task.getValue()) ; 
-            }
-            System.out.println("-----------------------------------------");
-            for (Job job : organizer.getJobs()) {
-                
-                System.out.println(job.getName() + ": ") ; 
-                
-                for (Task task : job.getTasks()) {
-                    
-                   System.out.print(" " + task.getName() + " " + task.getValue()) ;
-                    
-                }
-                System.out.println("");
-                System.out.println("*********************************");
-            }
             
-            for (Station station : organizer.getStations()) {
-                
-                System.out.println(station.getName());
-                
-            }
             
-            System.out.println("trimleri düzelt caneeer!!");
-
+            
         
             
             
