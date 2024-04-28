@@ -9,7 +9,6 @@ public class Parser{
     private static int currentDepth;
     private LineNumberReader reader;
     private ArrayList<String> tokens;
-    private ErrorDetector errorDetector;
     /* Gets argument as FileReader and */
     public Parser(FileReader r){
         Locale.setDefault(Locale.ENGLISH);
@@ -55,7 +54,6 @@ public class Parser{
                         continue;
                     }else if(s2 == ')'){
                         currentDepth++;
-                        
                         continue;
                     }
                     tmp.append(s2);
