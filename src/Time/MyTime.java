@@ -2,7 +2,7 @@ package Time;
 
 public class MyTime {
     private static long t0Milliseconds;
-    private static boolean iDidntKnowWhatToNameThisBoolean;
+    private static boolean functionHasBeenCalled;
 
     //the las vegas GP should be replaced with the istanbul GP
 
@@ -37,15 +37,15 @@ public class MyTime {
     public static boolean waitForSecondsCondition(double seconds){
         //this method is for use in while loops, to keep a certain while loop running for a
         //specific amount of time.
-        if(iDidntKnowWhatToNameThisBoolean){
+        if(functionHasBeenCalled){
             if(System.currentTimeMillis()-t0Milliseconds<=(long)(seconds*1000)){
                 return true;
             } else{
-                iDidntKnowWhatToNameThisBoolean=false;
+                functionHasBeenCalled=false;
                 return false;
             }
         } else{
-            iDidntKnowWhatToNameThisBoolean=true;
+            functionHasBeenCalled=true;
             t0Milliseconds=System.currentTimeMillis();
             return true;
         }
