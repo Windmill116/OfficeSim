@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 public class Parser{
-    private static int currentDepth;
+    private int currentDepth;
     private LineNumberReader reader;
     private ArrayList<String> tokens;
     /* Gets argument as FileReader and */
@@ -37,7 +37,11 @@ public class Parser{
         String line = readLine();
         
         while(line != null){
-            
+            //Add lineNumber token before the line
+            int lineNumber = reader.getLineNumber();
+            tokens.add(":line " + lineNumber + ":");
+
+            //Split line into pre-tokens
             String[] temp = line.split(" ");
 
             /*Add every token to general token list */
