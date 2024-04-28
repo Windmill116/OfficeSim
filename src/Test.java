@@ -1,4 +1,4 @@
-import Parser.ErrorDetector;
+
 import Parser.Job;
 import java.io.FileReader;
 import java.io.IOException;
@@ -19,17 +19,8 @@ public class Test {
             for (String token : tokens) {
                 System.out.println(token);
             }
-            ErrorDetector errorDetector = new ErrorDetector(tokens);
-            errorDetector.findErrors();
-            
-            Organizer organizer = new Organizer(tokens);
-            
-            
-            
-            
-        
-            
-            
+            //Organizer organizer = new Organizer(tokens);
+   
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

@@ -10,6 +10,11 @@ public class Task {
         this.name = name;
         this.value = value;
     }
+    public Task(String name) {
+        this.name = name;
+        this.value = -1;
+    }
+    
 
     public String getName() {
         return name;
