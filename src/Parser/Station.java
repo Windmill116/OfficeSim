@@ -2,6 +2,7 @@
 package Parser;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Station {
     
@@ -78,7 +79,24 @@ public class Station {
         this.speed = speed;
     }
     
+    public boolean isPlusMinus(){
+        if(this.plusMinus!=0){
+            return true;
+        } else{
+            return false;
+        }
+    }
     
-    
-    
+    public double calculateSpeed(){
+        if(this.isPlusMinus()){
+            Random r1=new Random(System.currentTimeMillis());
+            double randomDouble=0;
+            do{
+                randomDouble=r1.nextDouble(-this.plusMinus, this.plusMinus+1);
+            } while(randomDouble==0);
+            return (double)this.speed*(randomDouble/100);
+        }else{
+            return (double)this.speed;
+        }
+    }
 }
