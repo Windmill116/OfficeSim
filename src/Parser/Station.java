@@ -94,7 +94,7 @@ public class Station {
             do{
                 randomDouble=r1.nextDouble(-this.plusMinus, this.plusMinus+1);
             } while(randomDouble==0);
-            return (double)this.speed*(randomDouble/100);
+            return (double)this.speed*(randomDouble);
         }else{
             return (double)this.speed;
         }
