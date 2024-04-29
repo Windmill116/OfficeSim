@@ -127,6 +127,7 @@ class FrontendWorkflow{
         tasks = testTasks;
         stations = testStations;
 }
+}
 
 class tempJob{
     Job jobType; //to be replaced with JobType
