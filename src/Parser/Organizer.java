@@ -2,6 +2,8 @@
 package Parser;
 //made by Aykan Ugur all rights belong his coat
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class Organizer {
@@ -14,8 +16,14 @@ public class Organizer {
     private int index = 0;
     private int index2 = 0;
     private boolean error;
-    public Organizer(ArrayList<String> tokens) {
+    private int line = 1;
+    private boolean newLine = false;
+    private boolean firstTime = false;
+    private int maxLine;
+    private String text2;
+    public Organizer(ArrayList<String> tokens,int maxLine) {
         this.tokens = tokens;
+        this.maxLine = maxLine;
         taskErrorDetector();
     }
     
@@ -23,8 +31,16 @@ public class Organizer {
     {
         String ttt = null;
         for (String token : tokens) {
+            
+                String pattern = "^:[a-zA-Z]+\\s\\d+:";
+                Pattern p = Pattern.compile(pattern);
+                Matcher m = p.matcher(token);
+                if(m.find())
+                {
+                  continue;
+                }
             index++;
-           
+            
             if(typeFinder)
             {
                 
@@ -58,9 +74,19 @@ public class Organizer {
     
     private void organizeJobs()
     {
+                String pattern = "^:[a-zA-Z]+\\s\\d+:";
+                Pattern p = Pattern.compile(pattern);
+                
+        
         boolean jobFinder = false;
-        index += 2;
+        index += 3;
         for (int i =index ; i < tokens.size(); i++) {
+            Matcher m = p.matcher(tokens.get(i));
+                if(m.find())
+                {
+                  continue;
+                }
+               
            
           if(tokens.get(i).equals("("))
           {
@@ -75,11 +101,11 @@ public class Organizer {
               if(tokens.get(i).equals(")"))
               {
                   
-                   if(tokens.get(i+3).equals("stations")) // çok kırılgan bir kod dikkat!!
+                   if(tokens.get(i+4).equals("stations")) // çok kırılgan bir kod dikkat!! hata olduğu zaman buraya bak
                    {
                        i = i + 4;
                        index = i;
-                       organizeStations();
+                       StationErrorDetector();
                        break;
                    }
                    jobFinder = false;
@@ -91,7 +117,6 @@ public class Organizer {
                     ArrayList<Task> ts = jobs.get(jobs.size()-1).getTasks();
                     ts.get(ts.size()-1).setValue(val);
                        
-                        
                     } catch (NumberFormatException e) {
                         
                        for (Task task : tasks) {
@@ -108,8 +133,16 @@ public class Organizer {
     
     private void organizeStations()
     {
+        String pattern = "^:[a-zA-Z]+\\s\\d+:";
+        Pattern p = Pattern.compile(pattern);
+        
         index++;
         for (int i = index; i < tokens.size(); i++) {
+            Matcher m = p.matcher(tokens.get(i));
+            if(m.find())
+                {
+                  continue;
+                }
             
             if(tokens.get(i).equals("(")&& stationFinder == false)
             {
@@ -196,23 +229,34 @@ public class Organizer {
     }
     public void taskErrorDetector()
     {
-       if(!tokens.get(0).equals("("))
+        ArrayList<String> tasks2 = new ArrayList<String>();
+       if(!tokens.get(1).equals("("))
        {
-           System.out.println("line: " + "( is missing");
+           System.out.println("line: "+line + "( is missing");
            error = true;
        }
-        for (int i = 2; i < tokens.size(); i++) {
+        for (int i = 3; i < tokens.size(); i++) {
+            
+            String pattern = "^:[a-zA-Z]+\\s\\d+:";
+                Pattern p = Pattern.compile(pattern);
+                Matcher m = p.matcher(tokens.get(i));
+                if(m.find())
+                {
+                  line++;
+                    
+                  continue;
+                }
             
             if(tokens.get(i).equals("jobtypes"))
             {
                 if(!tokens.get(i-1).equals("("))
                 {
-                    System.out.println("line: " + "( is missing");
+                    System.out.println("line: "+line + "( is missing");
                     error = true;
                 }
-                if(!tokens.get(i-2).equals(")"))
+                if(!tokens.get(i-3).equals(")"))
                 {
-                   System.out.println("line: " + ") is missing"); 
+                   System.out.println("line: " +(line-1)+ ") is missing"); 
                    error = true;
                 }
                 index2 = i+1 ;
@@ -221,16 +265,32 @@ public class Organizer {
             }
                 try {
                             
-                     float val = (float)Double.parseDouble(tokens.get(i+1));
+                     float val = (float)Double.parseDouble(tokens.get(i));
                      if(val<0)
                      {
-                         System.out.println("line: "+ " " + tokens.get(i) + " value of task is smaller than 0 ");
+                         System.out.println("line: "+line+ " " + tokens.get(i) + " value of task is smaller than 0 ");
                          error = true;
+                         continue;
                      }
-                     i++;
+                     
                         
                     } catch (NumberFormatException e) {
+                     
+                       if(tasks2.contains(tokens.get(i)))
+                       {
+                           error = true;
+                           System.out.println("line: "+line+ " " + tokens.get(i) + " is already defined");
+                           continue;
+                       }else
+                       {
+                           tasks2.add(tokens.get(i));
+                           continue;
+ 
+                       }
+                        
                     }
+                
+               
         }
         
         error(error,"task");
@@ -242,52 +302,325 @@ public class Organizer {
     
     private void jobErrorDetector()
     {
-        if(!tokens.get(index2).equals("("))
-        {
-            System.out.println("line : " + "( is missing");
-            error = true;
-        }
-        index2++;
+         ArrayList<String> jobs2 = new ArrayList<String>();
+         String pattern = "^:[a-zA-Z]+\\s\\d+:";
+         Pattern p = Pattern.compile(pattern);
         for (int i = index2; i < tokens.size(); i++) {
-            try {
-                            
+          
+            
+                if(!newLine)
+                {  
+                Matcher m = p.matcher(tokens.get(i));
+                if(m.find())
+                {
+                  i++;
+                  line++;
+                  newLine = true;
+                  if(!tokens.get(i).equals("("))
+                  {
+                    System.out.println("line: "+line + "( is missing");
+                    error = true;
+                  }
+                    i++;
+                    if(jobs2.contains(tokens.get(i)))
+                    {
+                        System.out.println("line : "+line+" job type :" + tokens.get(i)+ " is already defined");
+                        error = true;
+                    }else
+                    {
+                        jobs2.add(tokens.get(i));
+                    }
+                  
+                }
+                continue;
+                }
+                if(newLine)
+                { 
+                 if(tokens.get(i).equals(")")) continue;
+                 //to do taskları kontrol et
+                Matcher m = p.matcher(tokens.get(i));
+                if(m.find())
+                {
+                  if(tokens.get(i+1).equals("stations")||tokens.get(i+2).equals("stations"))
+                  {
+                      //to do end the checker
+                      if(!tokens.get(i-1).equals(")"))
+                      {
+                          System.out.println("line: "+line + ") is missing");
+                          error = true;
+                      }
+                      if(!tokens.get(i-2).equals(")"))
+                      {
+                          System.out.println("line: "+line + ") is missing");
+                          error = true;
+                      }
+                         error(error,"jobs");
+                         if(!error)
+                         {
+                             index2 = i;
+                             organizeJobs();
+                         }
+                         break;
+                  }
+                  newLine = false;
+                  if(!tokens.get(i-1).equals(")"))
+                  {
+                    System.out.println("line: "+line + ") is missing");
+                    error = true;
+                  }
+                  i = i -1;
+                  continue;
+                }
+                 try {
                      float val = (float)Double.parseDouble(tokens.get(i));
                      if(val<0)
                      {
-                         System.out.println("line: "+ " " + tokens.get(i) + " value of task is smaller than 0 ");
+                         System.out.println("line: "+line+ " " + tokens.get(i) + " value of task is smaller than 0 ");
                          error = true;
+                     }  
+                    } catch (NumberFormatException e) {
+                        boolean already = false;
+                        
+                       for(Task taskName : tasks)
+                      {
+                        if(taskName.getName().equals(tokens.get(i)))
+                        {
+                           try {
+                                float val = (float)Double.parseDouble(tokens.get(i+1));
+                                
+                           } catch (Exception x) {
+                              
+                               if(taskName.getValue()==-1)
+                               {
+                                   System.out.println("line : " + line + " task : " + tokens.get(i)+ "value is not defined at tasktypes or jobtypes");
+                                   error = true;
+                               }
+                           }
+                           already = true;
+                                break;
+                          }
+                        
+                          }
+                          if(!already)
+                          {
+                               System.out.println("line : " + line + " task : " + tokens.get(i)+ " is not defined at tasktypes ");
+                           error = true; 
+                          }
+                    }
+                
+                }
+        }
+        
+    }
+    private void StationErrorDetector()
+    {
+        String stationName = "";
+        //start with line 7
+        String pattern = "^:[a-zA-Z]+\\s\\d+:";
+        Pattern p = Pattern.compile(pattern);
+        ArrayList<String> stations2 = new ArrayList<String>();
+        ArrayList<String> tmpTask = new ArrayList<String>();
+        newLine = false;
+        index2 = index2 + 1;
+        line++;
+        
+        
+                  if(!tokens.get(index2).equals("("))
+                  {
+                    System.out.println("line: "+line + "( is missing");
+                    error = true;
+                  }
+                  index2++;
+                  if(!tokens.get(index2).equals("stations"))
+                    {
+                        System.out.println("line : "+line+" you write stations keyword wrong or there is no stations");
+                        error = true;
+                        
+                    }
+                  stationName = tokens.get(index2);
+                  index2++;
+
+        for (int i = index2; i < tokens.size(); i++) {
+            
+            if(!newLine)
+                {  
+                    
+                Matcher m = p.matcher(tokens.get(i));
+                if(m.find()) // if our code find :line x : type
+                {
+                  i++;
+                  newLine = true;
+                  
+                    if(!tokens.get(i).equals("("))
+                    {
+                         System.out.println("line : "+line+"("+ " is not defined");
+                         error= true;
+                         
+                    }else
+                    {
+                        i++;
+                    }
+                    if(stations2.contains(tokens.get(i)))
+                    {
+                        System.out.println("line : "+line+" station type :" + tokens.get(i)+ " is already defined");
+                        error = true;
+                    }else
+                    {
+                        stations2.add(tokens.get(i));
+                    }
+                   i++;
+                    try {
+                         float val = (float)Double.parseDouble(tokens.get(i));
+                         if(val<0)
+                         {
+                           System.out.println("line : "+line+tokens.get(i)+ " is negative pls enter numbers which bigger than zero");
+                           error = true;
+                         }
+                    } catch (Exception e) {
+                        
+                        System.out.println("line : "+line+tokens.get(i)+ " is not number pls enter valid maxCapacity");
+                        error = true;
+                    }
+                    i++;
+                    
+                     try {
+                         float val = (float)Double.parseDouble(tokens.get(i));
+                         System.out.println("line : "+line+" " +tokens.get(i)+ " is not Y(yes) or N(no) pls enter valid character");
+                         error = true;
+                        } catch (Exception e) {
+                        
+                       if(!tokens.get(i).equals("y")&&!tokens.get(i).equals("n"))
+                       {
+                           System.out.println("line : "+line+" " +tokens.get(i)+ " is not Y(yes) or N(no) pls enter valid character");
+                           error = true;
+                       }
                      }
                      i++;
+                      try {
+                         float val = (float)Double.parseDouble(tokens.get(i));
+                         System.out.println("line : "+line+" " +tokens.get(i)+ " is not Y(yes) or N(no) pls enter valid character");
+                         error = true;
+                        } catch (Exception e) {
                         
-                    } catch (NumberFormatException e) {
-                        
-                  for (Task task : tasks) {
-                  
-                   if(tokens.get(i).equals(task.getName()))
-                   {
-                      if(task.getValue()==-1)
-                      {
-                          
-                       try {
-                            
-                             float val = (float)Double.parseDouble(tokens.get(i+1)); // if it has value
-                        
-                            } catch (NumberFormatException x) {
-                        
-                             //else
-                              System.out.println("task: " + tokens.get(i) + " has no defult value ");
-                        
-                            }
-                      }
-                    }else
-                     {
-                       System.out.println("task is not defined : " + tokens.get(i));
+                       if(!tokens.get(i).equals("y")&&!tokens.get(i).equals("n"))
+                       {
+                           System.out.println("line : "+line+" " +tokens.get(i)+ " is not Y(yes) or N(no) pls enter valid character");
+                           error = true;
+                       }
                      }
-                        }
-                        
+                      continue;
+                }
+                }else
+            {
+                
+                 if(tokens.get(i).equals(")")) continue;
+                 //to do taskları kontrol et
+                Matcher m = p.matcher(tokens.get(i));
+                if(m.find())
+                {
+                     line++;
+                  if(line==maxLine)
+                  {
+                      
+                      //to do end the checker
+                      if(!tokens.get(i-1).equals(")"))
+                      {
+                          System.out.println("line: "+line + ") is missing");
+                          error = true;
+                      }
+                      if(!tokens.get(i-2).equals(")"))
+                      {
+                          System.out.println("line: "+line + ") is missing");
+                          error = true;
+                      }
+                         error(error,"Stations");
+                         if(!error)
+                         {
+                             for (Job job : jobs) {
+                                 boolean defined = false;
+                                 String text = null;
+                                 for (Task task : job.getTasks()) {
+                                     if(defined) break;
+                                     for (String string : tmpTask) {
+                                         if(defined) break;
+                                         if(task.getName().equals(string))
+                                         {
+                                             text = task.getName();
+                                             defined = true;
+                                             break;
+                                         }
+                                         
+                                         if(defined) break;
+                                     }
+                                     if(defined) break;
+                                 }
+                                 if(!defined)
+                                     {
+                                         error = true;
+                                         System.out.println("you defined " + text +" and used in jobs but you did not use");
+                                     }
+                             }
+                             
+                             for (Task task : tasks) {
+                                 boolean defined = false;
+                                
+                                 
+                                 for (String string : tmpTask) {
+                                     if(defined) break;
+                                     
+                                     if(string.equals(task.getName()))
+                                     {
+                                         defined = true;
+                                         break;
+                                     }
+                                     if(defined) break;
+                                 }
+                                     if(!defined) System.out.println(task.getName()+" is defined but you did not use it be carefull");
+                                 }
+                                 organizeStations();
+                             }
+                             
+                             
+                         break;
                   }
-            
-            
+                  newLine = false;
+                  if(!tokens.get(i-1).equals(")"))
+                  {
+                    System.out.println("line: "+line + ") is missing");
+                    error = true;
+                  }
+                  i = i -1;
+                  continue;
+                }
+                 try {
+                     float val = (float)Double.parseDouble(tokens.get(i));
+                     if(val<0)
+                     {
+                         System.out.println("line: "+line+ " " + tokens.get(i-1) + " value of task is smaller than 0 ");
+                         error = true;
+                     }  
+                    } catch (NumberFormatException e) {
+                        boolean already = false;
+                        
+                       for(Task taskName : tasks)
+                      {
+                        if(taskName.getName().equals(tokens.get(i)))
+                        {
+                            tmpTask.add(taskName.getName());
+                            already = true;
+                            break;
+                          }
+                        
+                          }
+                          if(!already)
+                          {
+                               System.out.println("line : " + line + " task : " + tokens.get(i)+ " is not defined at tasktypes ");
+                               error = true;
+                          }
+                    
+                
+                }
+            }
             
         }
         
@@ -297,7 +630,4 @@ public class Organizer {
     {
         if(error) System.err.println("Before start the program or see other errors pls fix "+ text + " errors");
     }
-    
-    
-    
 }

@@ -16,11 +16,9 @@ public class Test {
             Parser p = new Parser(fr);
             p.workflowTokenizer();
             ArrayList<String> tokens = p.getTokens();
-            for (String token : tokens) {
-                System.out.println(token);
-            }
-            //Organizer organizer = new Organizer(tokens);
-   
+            
+            Organizer organizer = new Organizer(tokens,p.getLine());
+            
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
