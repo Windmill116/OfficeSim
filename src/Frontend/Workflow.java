@@ -16,7 +16,7 @@ public class Workflow {
             Parser p = new Parser(fr);
             p.workflowTokenizer();
             ArrayList<String> tokens = p.getTokens();
-            organizer = new Organizer(tokens);
+            organizer = new Organizer(tokens,p.getLine());
 
             FrontendWorkflow testFrontendWorkflow = new FrontendWorkflow(organizer);
             
