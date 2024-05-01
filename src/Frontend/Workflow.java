@@ -1,5 +1,8 @@
 package Frontend;
 import java.util.*;
+
+import javax.swing.event.DocumentEvent.EventType;
+
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -15,7 +18,9 @@ import Time.*;
 
 public class Workflow {
     static boolean testMode = true;
-
+    static enum EventType{
+        MESSAGE,REMOVE_TASK,QUEUE_TASK,ADD_TASK,FINISH_JOB,DO_JOB;
+    }
     public static void main(String[] args) {
         FrontendWorkflow testFrontendWorkflow;
         if(!testMode) {
@@ -59,14 +64,12 @@ class FrontendWorkflow{
         createTestObjects();
         assignTestObjectsAsMain();
         System.out.println(getTheFreeStation(jobs.get(2)).getName());
-
-        for(tempJob j : Collections.sort(jobs, new JobComparator())){
-
-        }
+        
+        
 
     }
     public void getArraysFromOrganizer(Organizer organizer){
-        jobs = organizer.getJobs();
+        //jobs = organizer.getJobs();
         stations = organizer.getStations();
         tasks = organizer.getTasks();
     }
@@ -144,7 +147,7 @@ class FrontendWorkflow{
         return inTasks;
     }
 
-    Station getTheFreeStation(Job j){
+    Station getTheFreeStation(tempJob j){
         ArrayList<Station> usableStations = new ArrayList<>();
         for(Station s:stations){
             boolean canUseStation=false;
@@ -160,15 +163,24 @@ class FrontendWorkflow{
         }
         return usableStations.get(0); //might add strategic selection later. That's why there is more than one usables added.
     }
+
+    void EventHandler(Event event){
+        if(event.getEventType()==Frontend.Workflow.EventType.ADD_TASK){
+            
+        }
+        
+    }
 }
 
 class tempJob{
+    String name;
     Job jobType; //to be replaced with JobType
     ArrayList<Task> tasks;
     double startTime;
     double duration;
 
     public tempJob(String name,Job jobType,double startTime,double duration){
+        this.name = name;
         this.jobType = jobType; 
         tasks = jobType.getTasks();
         this.startTime = startTime;
@@ -211,6 +223,10 @@ class tempJob{
         this.duration = duration;
     }
 
+    public String getName() {
+        return name;
+    }
+
 }
 
 class TaskComparator implements Comparator<Task> {
@@ -230,9 +246,18 @@ class JobComparator implements Comparator<tempJob> {
         if(job1.getStartTime()==job2.getStartTime()){
             return 0;
         }else if(job1.getStartTime()<job2.getStartTime()){
-            return 1;
-        }else{
             return -1;
+        }else{
+            return 1;
         }
+    }
+}
+
+class Event{
+    int eventStartTime;
+    int eventEndTime;
+    Workflow.EventType eventType;
+    public Workflow.EventType getEventType() {
+        return eventType;
     }
 }
