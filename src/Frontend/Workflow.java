@@ -1,10 +1,17 @@
 package Frontend;
-import java.util.ArrayList;
+import java.util.*;
 import java.io.FileReader;
 import java.io.IOException;
 
 import Parser.*;
 import Time.*;
+
+/*NOTES
+ * 1- I will assume the the jobStartTime is HOUR and the duration is in MINUTES
+ * 2- I will assume that the Jobs go one by one and tasks arent mixed but rather done Job by Job.
+ * 3- I will assume that the Job will select the station with the least job first.
+ */
+
 
 public class Workflow {
     static boolean testMode = true;
@@ -18,7 +25,7 @@ public class Workflow {
                 Parser p = new Parser(fr);
                 p.workflowTokenizer();
                 ArrayList<String> tokens = p.getTokens();
-                organizer = new Organizer(tokens);
+                organizer = new Organizer(tokens,p.getLine());
 
                 testFrontendWorkflow = new FrontendWorkflow(organizer);
                 
@@ -33,7 +40,7 @@ public class Workflow {
 
 class FrontendWorkflow{
 
-    private ArrayList<Job> jobs;
+    private ArrayList<tempJob> jobs;
     private ArrayList<Station> stations;
     private ArrayList<Task> tasks;
 
@@ -51,13 +58,18 @@ class FrontendWorkflow{
     public FrontendWorkflow(){
         createTestObjects();
         assignTestObjectsAsMain();
+        System.out.println(getTheFreeStation(jobs.get(2)).getName());
+
+        for(tempJob j : Collections.sort(jobs, new JobComparator())){
+
+        }
+
     }
     public void getArraysFromOrganizer(Organizer organizer){
         jobs = organizer.getJobs();
         stations = organizer.getStations();
         tasks = organizer.getTasks();
     }
-
     public void createTestObjects(){
         /*Job1 J1 1 30
         Job2 J1 2 29
@@ -86,7 +98,7 @@ class FrontendWorkflow{
         J2Tasks.add(testTasks.get(3));
         Job J3 = new Job("J3");
         ArrayList<Task> J3Tasks = new ArrayList<>();
-        J3Tasks.add(testTasks.get(1));
+        J3Tasks.add(testTasks.get(3)); //change to 1
 
         J1.setTasks(J1Tasks);
         J2.setTasks(J2Tasks);
@@ -121,12 +133,33 @@ class FrontendWorkflow{
         testStation3Tasks.add(testTasks.get(3));
         testStations.get(2).setTasks(testStation3Tasks);
     }
-
     public void assignTestObjectsAsMain(){
-        jobs = testJobTypes;
+        jobs = testJobs;
         tasks = testTasks;
         stations = testStations;
-}
+    }
+
+    ArrayList<Task> sortTasksByEarliestDeadline(ArrayList<Task> inTasks){
+        Collections.sort(inTasks, new TaskComparator());
+        return inTasks;
+    }
+
+    Station getTheFreeStation(Job j){
+        ArrayList<Station> usableStations = new ArrayList<>();
+        for(Station s:stations){
+            boolean canUseStation=false;
+            for(Task task: j.getTasks()){
+                if(s.getTasks().contains(task)){
+                    canUseStation=true;
+                    break;
+                }
+            }
+            if(canUseStation){
+                usableStations.add(s);
+            }
+        }
+        return usableStations.get(0); //might add strategic selection later. That's why there is more than one usables added.
+    }
 }
 
 class tempJob{
@@ -178,4 +211,28 @@ class tempJob{
         this.duration = duration;
     }
 
+}
+
+class TaskComparator implements Comparator<Task> {
+    public int compare(Task task1, Task task2) {
+        if(task1.getValue()==task2.getValue()){
+            return 0;
+        }else if(task1.getValue()>task2.getValue()){
+            return 1;
+        }else{
+            return -1;
+        }
+    }
+}
+
+class JobComparator implements Comparator<tempJob> {
+    public int compare(tempJob job1, tempJob job2) {
+        if(job1.getStartTime()==job2.getStartTime()){
+            return 0;
+        }else if(job1.getStartTime()<job2.getStartTime()){
+            return 1;
+        }else{
+            return -1;
+        }
+    }
 }
