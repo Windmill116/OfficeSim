@@ -19,6 +19,7 @@ public class Test {
             
             Organizer organizer = new Organizer(tokens,p.getLine());
             
+            
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

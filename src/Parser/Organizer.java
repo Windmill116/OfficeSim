@@ -2,10 +2,6 @@
 package Parser;
 //made by Aykan Ugur all rights belong his coat
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-
 public class Organizer {
     private boolean typeFinder,typeRead,stationFinder;
    
@@ -21,31 +17,50 @@ public class Organizer {
     private boolean firstTime = false;
     private int maxLine;
     private String text2;
-    public Organizer(ArrayList<String> tokens,int maxLine) {
+    private Boolean jobtypesB = false;
+    private boolean stationTypesB = false;
+    public Organizer(ArrayList<String> tokens,int maxLine) { //Constructor
         this.tokens = tokens;
         this.maxLine = maxLine;
-        taskErrorDetector();
+        
+        for (String token : tokens) { //checking fatal errors before start the start
+            if(token.equals("jobtypes"))
+            {
+                jobtypesB = true;
+            }
+            if(token.equals("stations"))
+            {
+                stationTypesB = true;
+               
+            }
+            if(jobtypesB&&stationTypesB) break;
+            
+        }
+      if(jobtypesB&&stationTypesB) // if everything is ok start to check tasks
+      {
+          taskErrorDetector();
+      }else // if its not ok print whats wrong
+      {
+          if(!jobtypesB)
+          {
+              System.err.println("jobtypes is not exist and it will cause a lots of problem before start the program fix it");
+          }else
+          {
+               System.err.println("stations is not exist and it will cause a lots of problem before start the program fix it");
+          }
+      }
     }
     
-    private void organizeTask()
+    private void organizeTask() // after task error check this code create task objects and send values to the objects
     {
-        String ttt = null;
-        for (String token : tokens) {
+        for (String token : tokens) { 
             
-                String pattern = "^:[a-zA-Z]+\\s\\d+:";
-                Pattern p = Pattern.compile(pattern);
-                Matcher m = p.matcher(token);
-                if(m.find())
-                {
-                  continue;
-                }
+            if(token.equals(":line:"))continue; // ignore the :line: its not in data its created by computer
             index++;
             
-            if(typeFinder)
+            if(typeFinder) // start type finder
             {
-                
                 typeFinder = false;
-                ttt= token;
                 
             }else
             {
@@ -54,67 +69,58 @@ public class Organizer {
                   typeFinder = true; //start type finder
                   continue;
                }
-               if(token.equals(")"))
+               if(token.equals(")")) // stop the organize task and start to check jobs
                {
                   jobErrorDetector();
                   break; 
                } 
                 try {
                             
-                     float val = (float)Double.parseDouble(token);
+                     float val = (float)Double.parseDouble(token); // if token is digit its add this value prev. task object
                      tasks.get(tasks.size()-1).setValue(val);
                         
                     } catch (NumberFormatException e) {
                         
-                        tasks.add(new Task(token));
+                        tasks.add(new Task(token)); // create new task object if token is not digit
                     }
             }
         }
     }
     
-    private void organizeJobs()
+    private void organizeJobs() // after jobs error check this code create job objects and send  values to the objects
     {
-                String pattern = "^:[a-zA-Z]+\\s\\d+:";
-                Pattern p = Pattern.compile(pattern);
-                
-        
-        boolean jobFinder = false;
-        index += 3;
+        boolean jobFinder = false; // define job finder
+        index += 3; // start with jobtypes
         for (int i =index ; i < tokens.size(); i++) {
-            Matcher m = p.matcher(tokens.get(i));
-                if(m.find())
-                {
-                  continue;
-                }
+            if(tokens.get(i).equals(":line:"))continue; // ignore the :line: its not in data its created by computer
                
            
-          if(tokens.get(i).equals("("))
+          if(tokens.get(i).equals("(")) // start to define jobs
           {
-              //after this its time for jobs
-              jobFinder = true;
-              jobs.add(new Job(tokens.get(i+1)));
-              i++;
+              jobFinder = true; // set jobfinder as true
+              jobs.add(new Job(tokens.get(i+1))); // create new job object
+              i++; // next --> job values
               continue;
           }
           if(jobFinder)
           {
-              if(tokens.get(i).equals(")"))
+              if(tokens.get(i).equals(")")) // until ) add values to job
               {
                   
-                   if(tokens.get(i+4).equals("stations")) // çok kırılgan bir kod dikkat!! hata olduğu zaman buraya bak
+                   if(tokens.get(i+4).equals("stations")) // this code is a little bit problem in first problem pls check this code!!
                    {
-                       i = i + 4;
-                       index = i;
-                       StationErrorDetector();
+                       i = i + 4; // to skip useless tokens
+                       index = i; // set index as i 
+                       StationErrorDetector(); // after finished to organize jobs start to check stations
                        break;
                    }
-                   jobFinder = false;
+                   jobFinder = false; // stop job finder
                    continue;
               }     
                    try {
                             
-                    float val = (float)Double.parseDouble(tokens.get(i));
-                    ArrayList<Task> ts = jobs.get(jobs.size()-1).getTasks();
+                    float val = (float)Double.parseDouble(tokens.get(i)); // check is token a value ?
+                    ArrayList<Task> ts = jobs.get(jobs.size()-1).getTasks(); //if it is digit send values to task
                     ts.get(ts.size()-1).setValue(val);
                        
                     } catch (NumberFormatException e) {
@@ -123,7 +129,7 @@ public class Organizer {
                   
                    if(tokens.get(i).equals(task.getName()))
                    {
-                       jobs.get(jobs.size()-1).getTasks().add(task);
+                       jobs.get(jobs.size()-1).getTasks().add(new Task(task.getName(),task.getValue())); // send task object to job object (has to)
                    }
                     }
               }
@@ -131,56 +137,46 @@ public class Organizer {
         }
     }
     
-    private void organizeStations()
+    private void organizeStations() // after stations error check , this code create station objects and send values to the that objects
     {
-        String pattern = "^:[a-zA-Z]+\\s\\d+:";
-        Pattern p = Pattern.compile(pattern);
-        
-        index++;
+        index++; // to skip useless tokens
         for (int i = index; i < tokens.size(); i++) {
-            Matcher m = p.matcher(tokens.get(i));
-            if(m.find())
-                {
-                  continue;
-                }
-            
-            if(tokens.get(i).equals("(")&& stationFinder == false)
+           if(tokens.get(i).equals(":line:"))continue; // ignore the :line: its not in data its created by computer
+            if(tokens.get(i).equals("(")&& stationFinder == false)  //if station finder is not working and its start of stations values
             {
                 String name = tokens.get(i+1);
-                float maxCapacity = (float)Double.parseDouble(tokens.get(i+2));
+                float maxCapacity = (float)Double.parseDouble(tokens.get(i+2)); // check max capacity
                 boolean mutliFlag = false;
                 boolean fifoflag = false;
-                if(tokens.get(i+3).equals("Y")) mutliFlag = true;
-                if(tokens.get(i+4).equals("Y")) fifoflag = true;
-                stations.add(new Station(name,maxCapacity,mutliFlag,fifoflag,0,0));
-                i = i + 4;
-                stationFinder = true;
+                if(tokens.get(i+3).equals("Y")) mutliFlag = true; // check multiflag
+                if(tokens.get(i+4).equals("Y")) fifoflag = true; // check fifoflag
+                stations.add(new Station(name,maxCapacity,mutliFlag,fifoflag,0,0)); // create a station object and send it to arraylist
+                i = i + 4; // to skip useless tokens
+                stationFinder = true; // start stationFinder
                 continue;
             }
             if(stationFinder)
             {
                 if(tokens.get(i).equals(")"))
                 {
-                    //to do 
+                    
                     try {
                         tokens.get(i+4);
                     } catch (Exception e) {
-                        
-                        
+                       
                         break;
                     }
                     stationFinder = false;
                 }else
                 {
                     try {
-                            
-                       float val = (float)Double.parseDouble(tokens.get(i));
-                       ArrayList<Task> ts = stations.get(stations.size()-1).getTasks();
+                       float val = (float)Double.parseDouble(tokens.get(i)); //to check is token a digit
+                       ArrayList<Task> ts = stations.get(stations.size()-1).getTasks(); // if it is a digit start this code block.
                        ts.get(ts.size()-1).setValue(val);
                        
                        try {
                            
-                           float val2 = (float)Double.parseDouble(tokens.get(i+1));
+                           float val2 = (float)Double.parseDouble(tokens.get(i+1)); //to check is token a digit
                           
                            stations.get(stations.size()-1).setPlusMinus(val2);
                            
@@ -192,9 +188,9 @@ public class Organizer {
                         
                        for (Task task : tasks) {
                   
-                   if(tokens.get(i).equals(task.getName()))
+                   if(tokens.get(i).equals(task.getName())) // if its not digit send task object to stations object
                    {
-                       stations.get(stations.size()-1).getTasks().add(task);
+                       stations.get(stations.size()-1).getTasks().add(new Task(task.getName(),task.getValue()));
                    }
                     }
               }
@@ -203,7 +199,7 @@ public class Organizer {
             }
         }
     }
-
+//*** START OF GET AND SET OBJECTS***
     public ArrayList<Task> getTasks() {
         return tasks;
     }
@@ -227,31 +223,34 @@ public class Organizer {
     public void setStations(ArrayList<Station> stations) {
         this.stations = stations;
     }
-    public void taskErrorDetector()
+    //*** END OF GET AND SET OBJECTS***
+    private void taskErrorDetector() // this method check task errors
     {
-        ArrayList<String> tasks2 = new ArrayList<String>();
-       if(!tokens.get(1).equals("("))
+        
+        ArrayList<String> tasks2 = new ArrayList<String>(); //to check same tasks
+       if(!tokens.get(1).equals("("))// check for (
        {
            System.out.println("line: "+line + "( is missing");
            error = true;
        }
+       if(!tokens.get(2).equals("tasktypes")) // check for tasktypes is wrong or not
+       {
+           error = true;
+           System.out.println("line: " + line + " you wrote tasktypes wrong");
+       }
         for (int i = 3; i < tokens.size(); i++) {
-            
-            String pattern = "^:[a-zA-Z]+\\s\\d+:";
-                Pattern p = Pattern.compile(pattern);
-                Matcher m = p.matcher(tokens.get(i));
-                if(m.find())
+           
+                if(tokens.get(i).equals(":line:")) // ignore :line: tokens
                 {
                   line++;
-                    
                   continue;
                 }
             
-            if(tokens.get(i).equals("jobtypes"))
+            if(tokens.get(i).equals("jobtypes")) // to end the code
             {
                 if(!tokens.get(i-1).equals("("))
                 {
-                    System.out.println("line: "+line + "( is missing");
+                    System.out.println("line: "+line + "( is missing"); 
                     error = true;
                 }
                 if(!tokens.get(i-3).equals(")"))
@@ -259,13 +258,12 @@ public class Organizer {
                    System.out.println("line: " +(line-1)+ ") is missing"); 
                    error = true;
                 }
-                index2 = i+1 ;
-                
+                index2 = i+1 ; // to skip useless tokens
                 break;
             }
                 try {
                             
-                     float val = (float)Double.parseDouble(tokens.get(i));
+                     float val = (float)Double.parseDouble(tokens.get(i)); // check is it digit 
                      if(val<0)
                      {
                          System.out.println("line: "+line+ " " + tokens.get(i) + " value of task is smaller than 0 ");
@@ -276,7 +274,7 @@ public class Organizer {
                         
                     } catch (NumberFormatException e) {
                      
-                       if(tasks2.contains(tokens.get(i)))
+                       if(tasks2.contains(tokens.get(i))) // if it is not digit start this code
                        {
                            error = true;
                            System.out.println("line: "+line+ " " + tokens.get(i) + " is already defined");
@@ -293,25 +291,21 @@ public class Organizer {
                
         }
         
-        error(error,"task");
+        error(error,"task"); // start error method
         if(!error)
         {
-           organizeTask();
+           organizeTask(); // if there is no error start organizetask
         }
     }
     
     private void jobErrorDetector()
     {
          ArrayList<String> jobs2 = new ArrayList<String>();
-         String pattern = "^:[a-zA-Z]+\\s\\d+:";
-         Pattern p = Pattern.compile(pattern);
         for (int i = index2; i < tokens.size(); i++) {
           
-            
                 if(!newLine)
                 {  
-                Matcher m = p.matcher(tokens.get(i));
-                if(m.find())
+                if(tokens.get(i).equals(":line:"))
                 {
                   i++;
                   line++;
@@ -337,9 +331,8 @@ public class Organizer {
                 if(newLine)
                 { 
                  if(tokens.get(i).equals(")")) continue;
-                 //to do taskları kontrol et
-                Matcher m = p.matcher(tokens.get(i));
-                if(m.find())
+                 
+                if(tokens.get(i).equals(":line:"))
                 {
                   if(tokens.get(i+1).equals("stations")||tokens.get(i+2).equals("stations"))
                   {
@@ -416,8 +409,6 @@ public class Organizer {
     {
         String stationName = "";
         //start with line 7
-        String pattern = "^:[a-zA-Z]+\\s\\d+:";
-        Pattern p = Pattern.compile(pattern);
         ArrayList<String> stations2 = new ArrayList<String>();
         ArrayList<String> tmpTask = new ArrayList<String>();
         newLine = false;
@@ -444,9 +435,7 @@ public class Organizer {
             
             if(!newLine)
                 {  
-                    
-                Matcher m = p.matcher(tokens.get(i));
-                if(m.find()) // if our code find :line x : type
+                if(tokens.get(i).equals(":line:")) // if our code find :line x : type
                 {
                   i++;
                   newLine = true;
@@ -515,8 +504,7 @@ public class Organizer {
                 
                  if(tokens.get(i).equals(")")) continue;
                  //to do taskları kontrol et
-                Matcher m = p.matcher(tokens.get(i));
-                if(m.find())
+                if(tokens.get(i).equals(":line:"))
                 {
                      line++;
                   if(line==maxLine)
@@ -628,6 +616,7 @@ public class Organizer {
     
     private void error(boolean error, String text)
     {
-        if(error) System.err.println("Before start the program or see other errors pls fix "+ text + " errors");
+        if(error) System.err.println("Before start the program or see other errors pls fix "+ text + " errors"+
+                "\ndo not forget these errors only "+ text+" errors, there may be more errors in other variables");
     }
 }
