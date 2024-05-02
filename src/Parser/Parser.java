@@ -9,7 +9,6 @@ public class Parser{
     private int currentDepth;
     private LineNumberReader reader;
     private ArrayList<String> tokens;
-    private int line;
     /* Gets argument as FileReader and */
     public Parser(FileReader r){
         Locale.setDefault(Locale.ENGLISH);
@@ -38,9 +37,7 @@ public class Parser{
         String line = readLine();
         
         while(line != null){
-            //Add lineNumber token before the line
-            int lineNumber = reader.getLineNumber();
-            tokens.add(":line " + lineNumber + ":");
+            tokens.add(":line:");
 
             //Split line into pre-tokens
             String[] temp = line.split(" ");
@@ -80,7 +77,7 @@ public class Parser{
         
         
         this.tokens.removeIf(String::isBlank);
-        tokens.add(":line " + (reader.getLineNumber()+1) + ":");
+        tokens.add(":line:");
         return tokens;
     }
 
