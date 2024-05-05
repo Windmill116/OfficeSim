@@ -3,6 +3,7 @@ package Time;
 public class MyTime {
     private static long t0Milliseconds;
     private static boolean functionHasBeenCalled;
+    private static boolean shouldBreak;
 
     //the las vegas GP should be replaced with the istanbul GP
 
@@ -35,8 +36,13 @@ public class MyTime {
     }
 
     public static boolean waitForSecondsCondition(double seconds){
+        if(shouldBreak){
+            shouldBreak=false;
+            return false;
+        }
         //this method is for use in while loops, to keep a certain while loop running for a
         //specific amount of time.
+        
         if(functionHasBeenCalled){
             if(System.currentTimeMillis()-t0Milliseconds<=(long)(seconds*1000)){
                 return true;
@@ -49,5 +55,9 @@ public class MyTime {
             t0Milliseconds=System.currentTimeMillis();
             return true;
         }
+    }
+
+    public static void breakTimeMethod(){
+        shouldBreak=true;
     }
 }
