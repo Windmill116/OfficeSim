@@ -178,6 +178,7 @@ class tempJob{
     ArrayList<Task> tasks;
     double startTime;
     double duration;
+    int currentTaskIndex;
 
     public tempJob(String name,Job jobType,double startTime,double duration){
         this.name = name;
@@ -185,6 +186,14 @@ class tempJob{
         tasks = jobType.getTasks();
         this.startTime = startTime;
         this.duration = duration;
+    }
+
+    public Task getCurrentTask(){
+        return this.tasks.get(this.currentTaskIndex);
+    }
+
+    public Task getNextTask(){
+        return this.tasks.get(++this.currentTaskIndex);
     }
 
     public void addTask(Task t){
