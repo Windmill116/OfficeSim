@@ -1,7 +1,6 @@
 package Frontend;
 import java.util.*;
 
-import javax.swing.event.DocumentEvent.EventType;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -55,6 +54,8 @@ class FrontendWorkflow{
     ArrayList<JobType> testJobTypes;
     ArrayList<Station> testStations;
 
+    ArrayList<Event> timedEvents = new ArrayList<>();
+
     Organizer organizer;
     public FrontendWorkflow(Organizer organizer){
         this.organizer = organizer;
@@ -66,7 +67,7 @@ class FrontendWorkflow{
         assignTestObjectsAsMain();
         System.out.println(getTheFreeStation(jobs.get(2)).getName());
         
-        
+        //addNewEvent()
 
     }
     public void getArraysFromOrganizer(Organizer organizer){
@@ -165,9 +166,24 @@ class FrontendWorkflow{
         return usableStations.get(0); //might add strategic selection later. That's why there is more than one usables added.
     }
 
-    void EventHandler(Event event){
-        if(event.getEventType()==Frontend.Workflow.EventType.ADD_TASK){
-            
+    void EventHandler(Event event, tempJob Job){
+        switch(event.eventType){
+            case ADD_TASK:
+                timedEvents.add(event);
+                break;
+            case REMOVE_TASK:
+                break;
+            case QUEUE_TASK:
+                break;
+            case FINISH_JOB:
+                break;
+            case DO_JOB:
+                break;
+            case MESSAGE:
+                break;
+            default:
+                break;
+
         }
         
     }
@@ -179,6 +195,7 @@ class tempJob{
     ArrayList<Task> tasks;
     double startTime;
     double duration;
+    int currentTaskIndex;
 
     public tempJob(String name,JobType jobType,double startTime,double duration){
         this.name = name;
@@ -186,6 +203,31 @@ class tempJob{
         tasks = jobType.getTasks();
         this.startTime = startTime;
         this.duration = duration;
+        this.currentTaskIndex=0;
+    }
+
+    public Task getCurrentTask(){
+        return this.tasks.get(this.currentTaskIndex);
+    }
+
+    public Task getNextTask(){
+        return this.tasks.get(++this.currentTaskIndex);
+    }
+
+    public boolean hasNextTask(){
+        if(this.currentTaskIndex+1<=this.tasks.size()){
+            return true;
+        } else{
+            return false;
+        }
+    }
+
+    public Task getTask(int index){
+        return this.tasks.get(index);
+    }
+
+    public void resetCurrentTaskIndex(){
+        this.currentTaskIndex=0;
     }
 
     public void addTask(Task t){
@@ -255,10 +297,24 @@ class JobComparator implements Comparator<tempJob> {
 }
 
 class Event{
-    int eventStartTime;
-    int eventEndTime;
+    int eventTime;
+
+    
+
     Workflow.EventType eventType;
     public Workflow.EventType getEventType() {
         return eventType;
+    }
+
+    Event(Workflow.EventType eventType){
+        this.eventType = eventType;
+    }
+
+    public int getEventTime() {
+        return eventTime;
+    }
+
+    public void setEventTime(int eventTime) {
+        this.eventTime = eventTime;
     }
 }
