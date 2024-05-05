@@ -7,8 +7,10 @@ public class Organizer {
    
     private ArrayList<String> tokens; // in
     private ArrayList<Task> tasks = new ArrayList<>();
-    private ArrayList<Job> jobs = new ArrayList<>();
+    private ArrayList<JobType> jobs = new ArrayList<>();
     private ArrayList<Station> stations = new ArrayList<>();
+    private ArrayList<String> jobTokens; // in 
+    private ArrayList<Job> jobArrayList = new ArrayList<>();
     private int index = 0;
     private int index2 = 0;
     private boolean error;
@@ -19,10 +21,10 @@ public class Organizer {
     private String text2;
     private Boolean jobtypesB = false;
     private boolean stationTypesB = false;
-    public Organizer(ArrayList<String> tokens,int maxLine) { //Constructor
+    public Organizer(ArrayList<String> tokens,int maxLine,ArrayList<String> jobTokens) { //Constructor
         this.tokens = tokens;
         this.maxLine = maxLine;
-        
+        this.jobTokens = jobTokens;
         for (String token : tokens) { //checking fatal errors before start the start
             if(token.equals("jobtypes"))
             {
@@ -87,7 +89,7 @@ public class Organizer {
         }
     }
     
-    private void organizeJobs() // after jobs error check this code create job objects and send  values to the objects
+    private void organizeJobTypes() // after jobs error check this code create job objects and send  values to the objects
     {
         boolean jobFinder = false; // define job finder
         index += 3; // start with jobtypes
@@ -98,7 +100,7 @@ public class Organizer {
           if(tokens.get(i).equals("(")) // start to define jobs
           {
               jobFinder = true; // set jobfinder as true
-              jobs.add(new Job(tokens.get(i+1))); // create new job object
+              jobs.add(new JobType(tokens.get(i+1))); // create new job object
               i++; // next --> job values
               continue;
           }
@@ -163,7 +165,7 @@ public class Organizer {
                     try {
                         tokens.get(i+4);
                     } catch (Exception e) {
-                       
+                       jobOrganizer();
                         break;
                     }
                     stationFinder = false;
@@ -208,11 +210,11 @@ public class Organizer {
         this.tasks = tasks;
     }
 
-    public ArrayList<Job> getJobs() {
+    public ArrayList<JobType> getJobs() {
         return jobs;
     }
 
-    public void setJobs(ArrayList<Job> jobs) {
+    public void setJobs(ArrayList<JobType> jobs) {
         this.jobs = jobs;
     }
 
@@ -351,7 +353,7 @@ public class Organizer {
                          if(!error)
                          {
                              index2 = i;
-                             organizeJobs();
+                             organizeJobTypes();
                          }
                          break;
                   }
@@ -524,7 +526,7 @@ public class Organizer {
                          error(error,"Stations");
                          if(!error)
                          {
-                             for (Job job : jobs) {
+                             for (JobType job : jobs) {
                                  boolean defined = false;
                                  String text = null;
                                  for (Task task : job.getTasks()) {
@@ -618,5 +620,47 @@ public class Organizer {
     {
         if(error) System.err.println("Before start the program or see other errors pls fix "+ text + " errors"+
                 "\ndo not forget these errors only "+ text+" errors, there may be more errors in other variables");
+    }
+    
+    //*** End of the workflow file methods**//
+    
+    private void jobOrganizer()
+    {
+        boolean jobFinder = false;
+         for (int i = 0; i < jobTokens.size(); i++) {
+            
+             if(jobTokens.get(i).equals(":line:")&& !jobFinder)
+             {
+                 jobFinder = true;
+                 i++;
+                 jobArrayList.add(new Job(jobTokens.get(i),null,-1,-1));
+                 break;
+             }
+             if(jobFinder)
+             {
+                 if(jobTokens.get(i).equals(":line:"))
+                 {
+                     jobFinder = false;
+                     i = i - 1;
+                 }else
+                 {
+                     for (JobType job : jobs) {
+                         if(job.getName().equals(jobTokens.get(i))) 
+                         {
+                             jobArrayList.get(jobArrayList.size()-1).setJobType(new JobType(job.getTasks(),job.getName()));
+                             i++;
+                             break;
+                         }
+                     }
+                     jobArrayList.get(jobArrayList.size()-1).setJobId((float)Double.parseDouble(jobTokens.get(i)));
+                     i++;
+                     jobArrayList.get(jobArrayList.size()-1).setJobTypeId((float)Double.parseDouble(jobTokens.get(i)));
+                     
+                 }
+             }
+             
+        }
+            
+        
     }
 }
