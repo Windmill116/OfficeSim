@@ -202,6 +202,7 @@ class tempJob{
         tasks = jobType.getTasks();
         this.startTime = startTime;
         this.duration = duration;
+        this.currentTaskIndex=0;
     }
 
     public Task getCurrentTask(){
@@ -210,6 +211,22 @@ class tempJob{
 
     public Task getNextTask(){
         return this.tasks.get(++this.currentTaskIndex);
+    }
+
+    public boolean hasNextTask(){
+        if(this.currentTaskIndex+1<=this.tasks.size()){
+            return true;
+        } else{
+            return false;
+        }
+    }
+
+    public Task getTask(int index){
+        return this.tasks.get(index);
+    }
+
+    public void resetCurrentTaskIndex(){
+        this.currentTaskIndex=0;
     }
 
     public void addTask(Task t){
