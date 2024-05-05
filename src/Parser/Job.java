@@ -1,35 +1,42 @@
 
 package Parser;
-//made by Aykan Ugur all rights belong his fork
-
-import java.util.ArrayList;
 
 public class Job {
     
-    ArrayList<Task> tasks = new ArrayList<>();
-    String name;
+    private JobType jobType;
+    private float jobId;
+    private float jobTypeId;
+    private String name;
 
-    public Job(String name) {
+    public Job(String name,JobType jobType, float jobId, float jobTypeId) {
         this.name = name;
-    }
-    
-    
-    
-
-    public ArrayList<Task> getTasks() {
-        return tasks;
+        this.jobType = jobType;
+        this.jobId = jobId;
+        this.jobTypeId = jobTypeId;
     }
 
-    public void setTasks(ArrayList<Task> tasks) {
-        this.tasks = tasks;
+    public JobType getJobType() {
+        return jobType;
     }
 
-    public String getName() {
-        return name;
+    public void setJobType(JobType jobType) {
+        this.jobType = jobType;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public float getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(float jobId) {
+        this.jobId = jobId;
+    }
+
+    public float getJobTypeId() {
+        return jobTypeId;
+    }
+
+    public void setJobTypeId(float jobTypeId) {
+        this.jobTypeId = jobTypeId;
     }
     
     

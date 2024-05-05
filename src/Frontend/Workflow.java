@@ -25,11 +25,12 @@ public class Workflow {
         if(!testMode) {
             Organizer organizer;
             try {
+                FileReader jb = new FileReader("job.txt");
                 FileReader fr = new FileReader("test.txt");
-                Parser p = new Parser(fr);
-                p.workflowTokenizer();
+                Parser p = new Parser(fr,jb);// add job file to fix problem
+                p.start();
                 ArrayList<String> tokens = p.getTokens();
-                organizer = new Organizer(tokens,p.getLine());
+                organizer = new Organizer(tokens,p.getLine(),p.getJobTokens());
 
                 testFrontendWorkflow = new FrontendWorkflow(organizer);
                 
@@ -50,7 +51,7 @@ class FrontendWorkflow{
 
     ArrayList<tempJob> testJobs;
     ArrayList<Task> testTasks;
-    ArrayList<Job> testJobTypes;
+    ArrayList<JobType> testJobTypes;
     ArrayList<Station> testStations;
 
     ArrayList<Event> timedEvents = new ArrayList<>();
@@ -90,17 +91,17 @@ class FrontendWorkflow{
         testTasks.add(new Task("T21", 5));
 
         testJobTypes = new ArrayList<>();
-        Job J1 = new Job("J1");
+        JobType J1 = new JobType("J1");
         ArrayList<Task> J1Tasks = new ArrayList<>();
         J1Tasks.add(testTasks.get(0));
         J1Tasks.add(testTasks.get(1));
         J1Tasks.add(testTasks.get(2));
-        Job J2 = new Job("J2");
+        JobType J2 = new JobType("J2");
         ArrayList<Task> J2Tasks = new ArrayList<>();
         J2Tasks.add(testTasks.get(1));
         J2Tasks.add(testTasks.get(2));
         J2Tasks.add(testTasks.get(3));
-        Job J3 = new Job("J3");
+        JobType J3 = new JobType("J3");
         ArrayList<Task> J3Tasks = new ArrayList<>();
         J3Tasks.add(testTasks.get(3)); //change to 1
 
@@ -190,13 +191,13 @@ class FrontendWorkflow{
 
 class tempJob{
     String name;
-    Job jobType; //to be replaced with JobType
+    JobType jobType; //to be replaced with JobType
     ArrayList<Task> tasks;
     double startTime;
     double duration;
     int currentTaskIndex;
 
-    public tempJob(String name,Job jobType,double startTime,double duration){
+    public tempJob(String name,JobType jobType,double startTime,double duration){
         this.name = name;
         this.jobType = jobType; 
         tasks = jobType.getTasks();
@@ -233,11 +234,11 @@ class tempJob{
         tasks.add(t);
     }
 
-    public Job getJobType() {
+    public JobType getJobType() {
         return jobType;
     }
 
-    public void setJobType(Job jobType) {
+    public void setJobType(JobType jobType) {
         this.jobType = jobType;
     }
 
