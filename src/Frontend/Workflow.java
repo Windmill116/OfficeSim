@@ -9,9 +9,8 @@ import Parser.*;
 import Time.*;
 
 /*NOTES
- * 1- I will assume the the jobStartTime is HOUR and the duration is in MINUTES
- * 2- I will assume that the Jobs go one by one and tasks arent mixed but rather done Job by Job.
- * 3- I will assume that the Job will select the station with the least job first.
+ * 1- I will assume that the Jobs go one by one and tasks arent mixed but rather done Job by Job.
+ * 2- I will assume that the Job will select the station with the least job first.
  */
 
 
@@ -209,7 +208,7 @@ class FrontendWorkflow{
 
 class tempJob{
     String name;
-    JobType jobType; //to be replaced with JobType
+    JobType jobType;
     ArrayList<Task> tasks;
     double startTime;
     double duration;
