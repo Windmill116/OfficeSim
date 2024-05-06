@@ -171,7 +171,7 @@ public class Organizer {
                 {
                     try {
                        float val = (float)Double.parseDouble(tokens.get(i)); //to check is token a digit
-                       ArrayList<Task> ts = stations.get(stations.size()-1).getTasks(); // if it is a digit start this code block.
+                       ArrayList<Task> ts = stations.get(stations.size()-1).getDefaultTasks(); // if it is a digit start this code block.
                        ts.get(ts.size()-1).setValue(val);
                        
                        try {
@@ -190,7 +190,7 @@ public class Organizer {
                   
                    if(tokens.get(i).equals(task.getName())) // if its not digit send task object to stations object
                    {
-                       stations.get(stations.size()-1).getTasks().add(new Task(task.getName(),task.getValue()));
+                       stations.get(stations.size()-1).getDefaultTasks().add(new Task(task.getName(),task.getValue()));
                    }
                     }
               }
