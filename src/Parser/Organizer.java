@@ -173,14 +173,14 @@ public class Organizer {
                 {
                     try {
                        float val = (float)Double.parseDouble(tokens.get(i)); //to check is token a digit
-                       ArrayList<Task> ts = stations.get(stations.size()-1).getDefaultTasks(); // if it is a digit start this code block.
-                       ts.get(ts.size()-1).setValue(val);
-                       
+                       // second
+                        stations.get(stations.size()-1).getDefaultTasks().getLast().setSpeed(val);// first
+                      
                        try {
                            
                            float val2 = (float)Double.parseDouble(tokens.get(i+1)); //to check is token a digit
                           
-                           stations.get(stations.size()-1).setPlusMinus(val2);
+                          stations.get(stations.size()-1).getDefaultTasks().getLast().setPlusMinus(val2);
                            
                        } catch (NumberFormatException e) {
                            
@@ -192,7 +192,7 @@ public class Organizer {
                   
                    if(tokens.get(i).equals(task.getName())) // if its not digit send task object to stations object
                    {
-                       stations.get(stations.size()-1).getDefaultTasks().add(new Task(task.getName(),task.getValue()));
+                       stations.get(stations.size()-1).getDefaultTasks().add(new Task(task.getName(),task.getValue()));// first
                    }
                     }
               }
