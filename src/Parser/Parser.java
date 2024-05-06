@@ -112,7 +112,8 @@ public class Parser{
                 for(char s2: s.toCharArray()){
 
                     /*If char is (  or ) add another token */
-                    tmp.append(s2);
+                    if(!Character.isISOControl(s2))
+                        tmp.append(s2);
                 }
 
                 jobTokens.add(tmp.toString().toLowerCase().trim());

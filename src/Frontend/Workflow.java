@@ -200,7 +200,7 @@ class FrontendWorkflow{
         }
     }
     void EventAdder(Object task){
-        if(task.getClass() == AddTaskEvent.class){
+        if(task instanceof AddTaskEvent){
             
         }
     }
