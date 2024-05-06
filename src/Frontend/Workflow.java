@@ -313,3 +313,25 @@ class JobComparator implements Comparator<tempJob> {
     }
 }
 
+class TempTask extends Task{
+    float speed;
+
+    public TempTask(String name, float speed){
+        super(name);
+        this.speed=speed;
+    }
+
+    public TempTask(String name, float speed, float value){
+        super(name, value);
+        this.speed=speed;
+    }
+
+    public float getSpeed(){
+        return this.speed;
+    }
+
+    public void setSpeed(float speed){
+        this.speed=speed;
+    }
+}
+
