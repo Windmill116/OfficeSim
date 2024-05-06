@@ -19,7 +19,15 @@ public class Test {
             ArrayList<String> tokens = p.getTokens();
             ArrayList<String> jobTokens =  p.getJobTokens();
             Organizer organizer = new Organizer(tokens,p.getLine(),p.getJobTokens());
-            
+            for (Station station : organizer.getStations()) {
+               
+                System.out.print("job name : " + station.getName());
+                for (Task defaultTask : station.getDefaultTasks()) {
+                    System.out.print(" task name : "+defaultTask.getName()+" speed : " + defaultTask.getSpeed()+ " task +/-: " + defaultTask.getPlusMinus());
+                }
+                System.out.println("");
+                
+            }
             
             
         } catch (IOException e) {
