@@ -1,8 +1,7 @@
 
 package Parser;
 
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
 
 public class Station {
     
@@ -12,7 +11,11 @@ public class Station {
     boolean fifoflag;
     float speed;
     float plusMinus;
-    ArrayList<Task> tasks = new ArrayList<>();
+    ArrayList<Task> defaultTasks = new ArrayList<>();
+
+    ArrayList<ArrayList<Task>> taskChannels = new ArrayList<>(); //channels for the multi task stations. If the station isn't multiflagged, get only thee first channel.
+
+    
 
     public Station(String name, float maxValue, boolean mutliFlag, boolean fifoflag, float speed, float plusMinus) {
         this.name = name;
@@ -21,14 +24,20 @@ public class Station {
         this.fifoflag = fifoflag;
         this.speed = speed;
         this.plusMinus = plusMinus;
+
+        for(int i = 0; i < maxCapacity; i++) {
+            taskChannels.add(new ArrayList<Task>());
+        }
+    }
+    public ArrayList<ArrayList<Task>> getTaskChannels() {
+        return taskChannels;
+    }
+    public ArrayList<Task> getDefaultTasks() {
+        return defaultTasks;
     }
 
-    public ArrayList<Task> getTasks() {
-        return tasks;
-    }
-
-    public void setTasks(ArrayList<Task> tasks) {
-        this.tasks = tasks;
+    public void setDefaultTasks(ArrayList<Task> defaultTasks) {
+        this.defaultTasks = defaultTasks;
     }
 
     public float getPlusMinus() {
@@ -97,6 +106,25 @@ public class Station {
             return (double)this.speed*(randomDouble);
         }else{
             return (double)this.speed;
+        }
+    }
+
+    public ArrayList<Task> getFreeChannel(){
+        ArrayList<ArrayList<Task>> allChannels = taskChannels;
+        Collections.sort(allChannels, new ChannelComparator());
+        return allChannels.get(0);
+    }
+}
+
+class ChannelComparator implements Comparator<ArrayList<Task>>{
+
+    public int compare(ArrayList<Task> task1, ArrayList<Task> task2) {
+        if(task1.size()==task2.size()){
+            return 0;
+        }else if(task1.size()>task2.size()){
+            return 1;
+        }else{
+            return -1;
         }
     }
 }

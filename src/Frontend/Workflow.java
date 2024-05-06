@@ -38,7 +38,12 @@ public class Workflow {
                 e.printStackTrace();
             }
         }else testFrontendWorkflow = new FrontendWorkflow();
+
     }
+
+    
+
+    
 
     
 }
@@ -54,8 +59,6 @@ class FrontendWorkflow{
     ArrayList<JobType> testJobTypes;
     ArrayList<Station> testStations;
 
-    ArrayList<Event> timedEvents = new ArrayList<>();
-
     Organizer organizer;
     public FrontendWorkflow(Organizer organizer){
         this.organizer = organizer;
@@ -65,10 +68,8 @@ class FrontendWorkflow{
     public FrontendWorkflow(){
         createTestObjects();
         assignTestObjectsAsMain();
-        System.out.println(getTheFreeStation(jobs.get(2)).getName());
-        
-        //addNewEvent()
 
+        WorkflowManager();
     }
     public void getArraysFromOrganizer(Organizer organizer){
         //jobs = organizer.getJobs();
@@ -122,39 +123,41 @@ class FrontendWorkflow{
 
         testStations = new ArrayList<>();
         testStations.add(new Station("S1",1,false,false,1,20));
-        testStations.add(new Station("S2",2,false,true,2,20));
-        testStations.add(new Station("S3",2,false,true,1.5f,20));
+        testStations.add(new Station("S2",2,true,true,2,20));
+        testStations.add(new Station("S3",2,true,true,1.5f,20));
 
         ArrayList<Task> testStation1Tasks = new ArrayList<>();
         testStation1Tasks.add(testTasks.get(0));
         testStation1Tasks.add(testTasks.get(1));
-        testStations.get(0).setTasks(testStation1Tasks);
+        testStations.get(0).setDefaultTasks(testStation1Tasks);
         ArrayList<Task> testStation2Tasks = new ArrayList<>();
         testStation2Tasks.add(testTasks.get(0));
         testStation2Tasks.add(testTasks.get(1));
-        testStations.get(1).setTasks(testStation2Tasks);
+        testStations.get(1).setDefaultTasks(testStation2Tasks);
         ArrayList<Task> testStation3Tasks = new ArrayList<>();
         testStation3Tasks.add(testTasks.get(2));
         testStation3Tasks.add(testTasks.get(3));
-        testStations.get(2).setTasks(testStation3Tasks);
+        testStations.get(2).setDefaultTasks(testStation3Tasks);
     }
     public void assignTestObjectsAsMain(){
         jobs = testJobs;
         tasks = testTasks;
         stations = testStations;
     }
-
     ArrayList<Task> sortTasksByEarliestDeadline(ArrayList<Task> inTasks){
         Collections.sort(inTasks, new TaskComparator());
         return inTasks;
     }
-
-    Station getTheFreeStation(tempJob j){
+    ArrayList<tempJob> sortJobsByStartTime(ArrayList<tempJob> inJobs){
+        Collections.sort(inJobs, new JobComparator());
+        return inJobs;
+    }
+    Station getTheFreeStationByJob(tempJob j){
         ArrayList<Station> usableStations = new ArrayList<>();
         for(Station s:stations){
             boolean canUseStation=false;
             for(Task task: j.getTasks()){
-                if(s.getTasks().contains(task)){
+                if(s.getDefaultTasks().contains(task)){
                     canUseStation=true;
                     break;
                 }
@@ -165,27 +168,42 @@ class FrontendWorkflow{
         }
         return usableStations.get(0); //might add strategic selection later. That's why there is more than one usables added.
     }
-
-    void EventHandler(Event event, tempJob Job){
-        switch(event.eventType){
-            case ADD_TASK:
-                timedEvents.add(event);
-                break;
-            case REMOVE_TASK:
-                break;
-            case QUEUE_TASK:
-                break;
-            case FINISH_JOB:
-                break;
-            case DO_JOB:
-                break;
-            case MESSAGE:
-                break;
-            default:
-                break;
-
-        }
+    Station getTheFreeStationByTask(Task t){
+        ArrayList<Station> usableStations = new ArrayList<>();
+        for(Station s:stations){
+            boolean canUseStation=false;
+            if(s.getDefaultTasks().contains(t)){
+                canUseStation=true;
+            }
         
+            if(canUseStation){
+                usableStations.add(s);
+            }
+        }
+        return usableStations.get(0); //might add strategic selection later. That's why there is more than one usables added.
+    }
+
+    
+    void WorkflowManager(){
+        System.out.println("initially initialized");
+        for(tempJob job : jobs){
+            for(Task t : job.getTasks()){
+                Station s = getTheFreeStationByTask(t);
+                if(s.isMutliFlag()){
+                    ArrayList<Task> freeStationChannel = s.getFreeChannel();
+                    freeStationChannel.add(t);
+                    System.out.println(t.getName() + " " + s.getName() + " Multi Channel Station. Tasks in line: " + freeStationChannel.size());
+                }else{
+                    s.getTaskChannels().get(0).add(t);
+                    System.out.println("  " + t.getName() + " " + s.getName() + " Single Channel Station. Tasks in line: "+s.getTaskChannels().get(0).size());
+                }
+            }
+        }
+    }
+    void EventAdder(Object task){
+        if(task.getClass() == AddTaskEvent.class){
+            
+        }
     }
 }
 
@@ -296,25 +314,3 @@ class JobComparator implements Comparator<tempJob> {
     }
 }
 
-class Event{
-    int eventTime;
-
-    
-
-    Workflow.EventType eventType;
-    public Workflow.EventType getEventType() {
-        return eventType;
-    }
-
-    Event(Workflow.EventType eventType){
-        this.eventType = eventType;
-    }
-
-    public int getEventTime() {
-        return eventTime;
-    }
-
-    public void setEventTime(int eventTime) {
-        this.eventTime = eventTime;
-    }
-}
