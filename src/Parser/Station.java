@@ -11,7 +11,8 @@ public class Station {
     boolean fifoflag;
     float speed;
     float plusMinus;
-    ArrayList<Task> defaultTasks = new ArrayList<>();
+    ArrayList<Task> defaultTasks = new ArrayList<>(); 
+    ArrayList<SpecializedTask> defaultTasksSpecialized = new ArrayList<>();
 
     ArrayList<ArrayList<Task>> taskChannels = new ArrayList<>(); //channels for the multi task stations. If the station isn't multiflagged, get only thee first channel.
 
@@ -126,5 +127,38 @@ class ChannelComparator implements Comparator<ArrayList<Task>>{
         }else{
             return -1;
         }
+    }
+}
+
+class SpecializedTask{
+    Task task;
+    float speed;
+    float randomness = 0;
+
+    public SpecializedTask(Task task, float speed){
+        this.task=task;
+        this.speed=speed;
+    }
+
+    public SpecializedTask(Task task, float speed, float randomness){
+        this.task=task;
+        this.speed=speed;
+        this.randomness=randomness;
+    }
+
+    public float getSpeed(){
+        return this.speed;
+    }
+
+    public void setSpeed(float speed){
+        this.speed=speed;
+    }
+
+    public Task getTask(){
+        return this.task;
+    }
+
+    public void setTask(Task task){
+        this.task=task;
     }
 }

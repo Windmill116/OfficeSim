@@ -184,7 +184,7 @@ class FrontendWorkflow{
 
     
     void WorkflowManager(){
-        System.out.println("initially initialized");
+        System.out.println("In Workflow Manager.");
         for(tempJob job : jobs){
             for(Task t : job.getTasks()){
                 Station s = getTheFreeStationByTask(t);
@@ -313,29 +313,5 @@ class JobComparator implements Comparator<tempJob> {
     }
 }
 
-class TempTask{
-    Task task;
-    float speed;
 
-    public TempTask(Task task, float speed){
-        this.task=task;
-        this.speed=speed;
-    }
-
-    public float getSpeed(){
-        return this.speed;
-    }
-
-    public void setSpeed(float speed){
-        this.speed=speed;
-    }
-
-    public Task getTask(){
-        return this.task;
-    }
-
-    public void setTask(Task task){
-        this.task=task;
-    }
-}
 
