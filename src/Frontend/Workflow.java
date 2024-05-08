@@ -15,7 +15,7 @@ import Time.*;
 
 
 public class Workflow {
-    static boolean testMode = true;
+    static boolean testMode = false;
     static enum EventType{
         MESSAGE,REMOVE_TASK,QUEUE_TASK,ADD_TASK,FINISH_JOB,DO_JOB;
     }
@@ -50,6 +50,7 @@ public class Workflow {
 class FrontendWorkflow{
 
     private ArrayList<tempJob> jobs;
+    private ArrayList<JobType> jobTypes;
     private ArrayList<Station> stations;
     private ArrayList<Task> tasks;
 
@@ -72,8 +73,17 @@ class FrontendWorkflow{
     }
     public void getArraysFromOrganizer(Organizer organizer){
         //jobs = organizer.getJobs();
+        createTestObjects();
+        jobs = testJobs;
+        jobTypes = organizer.getJobs();
+        
         stations = organizer.getStations();
+
         tasks = organizer.getTasks();
+
+        System.out.println(tasks.get(0).getName());
+        
+        WorkflowManager();
     }
     public void createTestObjects(){
         /*Job1 J1 1 30
@@ -171,8 +181,12 @@ class FrontendWorkflow{
         ArrayList<Station> usableStations = new ArrayList<>();
         for(Station s:stations){
             boolean canUseStation=false;
-            if(s.getDefaultTasks().contains(t)){
-                canUseStation=true;
+            for(Task sTask : s.getDefaultTasks()){
+                //System.out.println(sTask.getName()+ " " + t.getName());
+                if(sTask.getName().toUpperCase().equals(t.getName())){
+                    
+                    canUseStation=true;
+                }
             }
         
             if(canUseStation){
@@ -184,25 +198,38 @@ class FrontendWorkflow{
 
     
     void WorkflowManager(){
-        System.out.println("initially initialized");
+        System.out.println("In Workflow Manager.");
         for(tempJob job : jobs){
+            System.out.println("For Job: " + job.getName());
             for(Task t : job.getTasks()){
                 Station s = getTheFreeStationByTask(t);
-                if(s.isMutliFlag()){
+                if(s.getMaxCapacity()>1){
                     ArrayList<Task> freeStationChannel = s.getFreeChannel();
-                    freeStationChannel.add(t);
-                    System.out.println(t.getName() + " " + s.getName() + " Multi Channel Station. Tasks in line: " + freeStationChannel.size());
+                    freeStationChannel.add(getTaskFromStationByName(t, s));
+                    System.out.println(t.getName() + " " + getTaskFromStationByName(t, s).getSpeed() + " " + s.getName() + " Multi Channel Station. Tasks in line: " + freeStationChannel.size() );
                 }else{
                     s.getTaskChannels().get(0).add(t);
-                    System.out.println("  " + t.getName() + " " + s.getName() + " Single Channel Station. Tasks in line: "+s.getTaskChannels().get(0).size());
+                    System.out.println("  " + t.getName() + " " + getTaskFromStationByName(t, s).getSpeed() + " "+ s.getName() + " Single Channel Station. Tasks in line: "+s.getTaskChannels().get(0).size());
                 }
             }
         }
     }
     void EventAdder(Object task){
-        if(task.getClass() == AddTaskEvent.class){
+        if(task instanceof AddTaskEvent){
             
         }
+    }
+
+    Task getTaskFromStationByName(Task t, Station s){
+        ArrayList<Task> tasks = s.getDefaultTasks();
+        for(Task sTask : tasks){
+            if(sTask.getName().toUpperCase().equals(t.getName())){
+                Task t1 = sTask;
+                t1.setValue(t.getValue());
+                return t1;
+            }
+        }
+        return null;
     }
 }
 
@@ -310,6 +337,39 @@ class JobComparator implements Comparator<tempJob> {
         }else{
             return 1;
         }
+    }
+}
+
+class SpecializedTask{
+    Task task;
+    float speed;
+    float randomness = 0;
+
+    public SpecializedTask(Task task, float speed){
+        this.task=task;
+        this.speed=speed;
+    }
+
+    public SpecializedTask(Task task, float speed, float randomness){
+        this.task=task;
+        this.speed=speed;
+        this.randomness=randomness;
+    }
+
+    public float getSpeed(){
+        return this.speed;
+    }
+
+    public void setSpeed(float speed){
+        this.speed=speed;
+    }
+
+    public Task getTask(){
+        return this.task;
+    }
+
+    public void setTask(Task task){
+        this.task=task;
     }
 }
 
