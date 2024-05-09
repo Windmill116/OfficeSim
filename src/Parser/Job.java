@@ -4,15 +4,15 @@ package Parser;
 public class Job {
     
     private JobType jobType;
-    private float jobId;
-    private float jobTypeId;
-    private String name;
+    private float startTime;
+    private float duration;
+    private String jobId;
 
-    public Job(String name,JobType jobType, float jobId, float jobTypeId) {
-        this.name = name;
-        this.jobType = jobType;
+    public Job(String jobId,JobType jobType, float startTime, float duration) {
         this.jobId = jobId;
-        this.jobTypeId = jobTypeId;
+        this.jobType = jobType;
+        this.startTime = startTime;
+        this.duration = duration;
     }
 
     public JobType getJobType() {
@@ -23,21 +23,31 @@ public class Job {
         this.jobType = jobType;
     }
 
-    public float getJobId() {
+    public float getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(float startTime) {
+        this.startTime = startTime;
+    }
+
+    public float getDuration() {
+        return duration;
+    }
+
+    public void setDuration(float duration) {
+        this.duration = duration;
+    }
+
+    public String getJobId() {
         return jobId;
     }
 
-    public void setJobId(float jobId) {
+    public void setJobId(String jobId) {
         this.jobId = jobId;
     }
 
-    public float getJobTypeId() {
-        return jobTypeId;
-    }
-
-    public void setJobTypeId(float jobTypeId) {
-        this.jobTypeId = jobTypeId;
-    }
+    
     
     
     
