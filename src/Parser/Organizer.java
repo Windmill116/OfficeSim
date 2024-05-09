@@ -659,9 +659,9 @@ public class Organizer {
                              break;
                          }
                      }
-                     jobArrayList.get(jobArrayList.size()-1).setJobId((float)Double.parseDouble(jobTokens.get(i)));
+                     jobArrayList.get(jobArrayList.size()-1).setStartTime((float)Double.parseDouble(jobTokens.get(i)));
                      i++;
-                     jobArrayList.get(jobArrayList.size()-1).setJobTypeId((float)Double.parseDouble(jobTokens.get(i)));
+                     jobArrayList.get(jobArrayList.size()-1).setDuration((float)Double.parseDouble(jobTokens.get(i)));
                      
                  }
              }
