@@ -1,10 +1,11 @@
 package Frontend;
 import java.util.*;
+
+
 import java.io.FileReader;
 import java.io.IOException;
 
 import Parser.*;
-import Frontend.*;
 import Time.*;
 
 /*NOTES
@@ -59,9 +60,6 @@ class FrontendWorkflow{
     ArrayList<Station> testStations;
 
     Organizer organizer;
-
-    ArrayList<Object> eventList = new ArrayList<Object>();
-
     public FrontendWorkflow(Organizer organizer){
         this.organizer = organizer;
         getArraysFromOrganizer(organizer);
@@ -77,7 +75,7 @@ class FrontendWorkflow{
         //jobs = organizer.getJobs();
         createTestObjects();
         jobs = testJobs;
-        jobTypes = organizer.getJobs();
+        jobTypes = organizer.getJobTypes();
         
         stations = organizer.getStations();
 
@@ -200,9 +198,6 @@ class FrontendWorkflow{
 
     
     void WorkflowManager(){
-        extractJobEventsFromJobList();
-        HandleEvents();
-        /* 
         System.out.println("In Workflow Manager.");
         for(tempJob job : jobs){
             System.out.println("For Job: " + job.getName());
@@ -212,71 +207,24 @@ class FrontendWorkflow{
                     ArrayList<Task> freeStationChannel = s.getFreeChannel();
                     freeStationChannel.add(getTaskFromStationByName(t, s));
                     System.out.println(t.getName() + " " + getTaskFromStationByName(t, s).getSpeed() + " " + s.getName() + " Multi Channel Station. Tasks in line: " + freeStationChannel.size() );
-
-                    AddTaskEvent event = new AddTaskEvent(job.getStartTime(),getTaskFromStationByName(t, s),s,freeStationChannel);
-                    EventAdder(event);
                 }else{
                     s.getTaskChannels().get(0).add(t);
                     System.out.println("  " + t.getName() + " " + getTaskFromStationByName(t, s).getSpeed() + " "+ s.getName() + " Single Channel Station. Tasks in line: "+s.getTaskChannels().get(0).size());
                 }
             }
         }
-        */
     }
-
-    void extractJobEventsFromJobList(){
-        Collections.sort(jobs, new JobComparator());
-        for(tempJob job : jobs){
-            QueueJobEvent event = new QueueJobEvent(job.startTime,job);
-            EventAdder(event);
-        }
-    }
-
-    void extractTaskEventsFromJob(tempJob job){
-        System.out.println("For Job: " + job.getName());
-        for(Task t : job.getTasks()){
-            Station s = getTheFreeStationByTask(t);
-            ArrayList<Task> freeStationChannel = s.getFreeChannel();
-            AddTaskEvent event = new AddTaskEvent(job.getStartTime(),getTaskFromStationByName(t, s),s,freeStationChannel);
+    void EventAdder(Object task){
+        if(task instanceof AddTaskEvent){
             
-            EventAdder(event);
         }
     }
-
-    void EventAdder(Object event){
-        eventList.add(event);
-    }
-
-    void HandleEvents(){
-        for(Object event : eventList){
-            switch(event.getClass().getSimpleName()){
-                case "AddTaskEvent":
-                    break;
-                case "RemoveTaskEvent":
-                    break;
-                case "QueueJobEvent":
-                    QueueJobEvent queueJobEvent = (QueueJobEvent)event;
-                    //First things first the jobs should queue, then the tasks.
-                    extractTaskEventsFromJob(queueJobEvent.getJob());
-                    break;
-                case "FinishJobEvent":
-                    break;
-            }
-
-        }
-
-        System.out.println(eventList.toString());
-    }
-
-    //on getTaskFromStationByName we get the task from the station by the name of the given task parameter,
-    //we make a new task and we set it to station's 
-    //then we set the value of the task to job files value.
 
     Task getTaskFromStationByName(Task t, Station s){
         ArrayList<Task> tasks = s.getDefaultTasks();
         for(Task sTask : tasks){
             if(sTask.getName().toUpperCase().equals(t.getName())){
-                Task t1 = (Task) sTask.clone();
+                Task t1 = sTask;
                 t1.setValue(t.getValue());
                 return t1;
             }
@@ -289,11 +237,11 @@ class tempJob{
     String name;
     JobType jobType;
     ArrayList<Task> tasks;
-    int startTime;
+    double startTime;
     double duration;
     int currentTaskIndex;
 
-    public tempJob(String name,JobType jobType,int startTime,double duration){
+    public tempJob(String name,JobType jobType,double startTime,double duration){
         this.name = name;
         this.jobType = jobType; 
         tasks = jobType.getTasks();
@@ -346,11 +294,11 @@ class tempJob{
         this.tasks = tasks;
     }
 
-    public int getStartTime() {
+    public double getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(int startTime) {
+    public void setStartTime(double startTime) {
         this.startTime = startTime;
     }
 
