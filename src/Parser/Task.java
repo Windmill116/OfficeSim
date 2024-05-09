@@ -56,7 +56,11 @@ public class Task {
         this.plusMinus = plusMinus;
     }
     
-    
+    @Override
+    public Task clone(){
+        Task returnTask = new Task(this.name, this.value, this.speed, this.plusMinus);
+        return returnTask;
+    }
     
     
 }
