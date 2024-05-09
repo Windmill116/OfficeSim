@@ -57,6 +57,9 @@ public class Parser{
                 /*Build a token char by char*/
                 for(char s2: s.toCharArray()){
 
+                    if(Character.isISOControl(s2))
+                        continue;
+
                     /*If char is (  or ) add another token */
                     if(s2 == '('){
                         tokens.add("(");
