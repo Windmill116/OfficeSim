@@ -1,26 +1,15 @@
 
 package Parser;
-//made by Aykan Ugur all rights belong his coat
 import java.util.ArrayList;
 public class Organizer {
-    private boolean typeFinder,typeRead,stationFinder;
-   
     private ArrayList<String> tokens; // in
     private ArrayList<Task> tasks = new ArrayList<>();
     private ArrayList<JobType> jobs = new ArrayList<>();
     private ArrayList<Station> stations = new ArrayList<>();
     private ArrayList<String> jobTokens; // in 
     private ArrayList<Job> jobArrayList = new ArrayList<>();
-    private int index = 0;
-    private int index2 = 0;
-    private boolean error;
-    private int line = 1;
-    private boolean newLine = false;
-    private boolean firstTime = false;
-    private int maxLine;
-    private String text2;
-    private Boolean jobtypesB = false;
-    private boolean stationTypesB = false;
+    private int index = 0,index2 = 0,line = 1,maxLine;
+    private boolean newLine = false,error,jobtypesB = false,stationTypesB = false;
     public Organizer(ArrayList<String> tokens,int maxLine,ArrayList<String> jobTokens) { //Constructor
         this.tokens = tokens;
         this.maxLine = maxLine;
@@ -52,152 +41,113 @@ public class Organizer {
           }
       }
     }
-    
     private void organizeTask() // after task error check this code create task objects and send values to the objects
     {
-        for (String token : tokens) { 
+        for (int i = 3; i < tokens.size(); i++) {
+            if(tokens.get(i).equals(":line:")) continue;
             
-            if(token.equals(":line:"))continue; // ignore the :line: its not in data its created by computer
-            index++;
-            
-            if(typeFinder) // start type finder
+            if(tokens.get(i).equals(")"))
             {
-                typeFinder = false;
+                index = i+4;
+                jobErrorDetector();
+                break;
+            }else
+            {
+                if(tokens.get(i).startsWith("t"))
+                {
+                    tasks.add(new Task(tokens.get(i)));
+                }else
+                {
+                    tasks.getLast().setValue((float)Double.parseDouble(tokens.get(i)));
+                }
+            }
+        }
+    }
+    private void organizeJobTypes() // after jobs error check this code create job objects and send  values to the objects
+    {
+        for (int i = index; i < tokens.size(); i++) {
+            if(tokens.get(i).equals("(")||tokens.get(i).equals(")")) continue;
+            
+            if(tokens.get(i).equals(":line:"))
+            {
+               if(tokens.get(i+2).equals("stations"))
+               {
+                   index = i + 3;
+                   StationErrorDetector();
+                   break;
+               }else
+               {
+                    i = i + 2;
+                    jobs.add(new JobType(tokens.get(i)));
+               }
                 
             }else
             {
-               if(token.equals("("))
-               {
-                  typeFinder = true; //start type finder
-                  continue;
-               }
-               if(token.equals(")")) // stop the organize task and start to check jobs
-               {
-                  jobErrorDetector();
-                  break; 
-               } 
-                try {
-                            
-                     float val = (float)Double.parseDouble(token); // if token is digit its add this value prev. task object
-                     tasks.get(tasks.size()-1).setValue(val);
-                        
-                    } catch (NumberFormatException e) {
-                        
-                        tasks.add(new Task(token)); // create new task object if token is not digit
-                    }
-            }
-        }
-    }
-    
-    private void organizeJobTypes() // after jobs error check this code create job objects and send  values to the objects
-    {
-        boolean jobFinder = false; // define job finder
-        index += 3; // start with jobtypes
-        for (int i =index ; i < tokens.size(); i++) {
-            if(tokens.get(i).equals(":line:"))continue; // ignore the :line: its not in data its created by computer
-               
-           
-          if(tokens.get(i).equals("(")) // start to define jobs
-          {
-              jobFinder = true; // set jobfinder as true
-              jobs.add(new JobType(tokens.get(i+1))); // create new job object
-              i++; // next --> job values
-              continue;
-          }
-          if(jobFinder)
-          {
-              if(tokens.get(i).equals(")")) // until ) add values to job
-              {
-                  
-                   if(tokens.get(i+4).equals("stations")) // this code is a little bit problem in first problem pls check this code!!
-                   {
-                       i = i + 4; // to skip useless tokens
-                       index = i; // set index as i 
-                       StationErrorDetector(); // after finished to organize jobs start to check stations
-                       break;
-                   }
-                   jobFinder = false; // stop job finder
-                   continue;
-              }     
-                   try {
-                            
-                    float val = (float)Double.parseDouble(tokens.get(i)); // check is token a value ?
-                    ArrayList<Task> ts = jobs.get(jobs.size()-1).getTasks(); //if it is digit send values to task
-                    ts.get(ts.size()-1).setValue(val);
-                       
-                    } catch (NumberFormatException e) {
-                        
-                       for (Task task : tasks) {
-                  
-                   if(tokens.get(i).equals(task.getName()))
-                   {
-                       jobs.get(jobs.size()-1).getTasks().add(new Task(task.getName(),task.getValue())); // send task object to job object (has to)
-                   }
-                    }
-              }
-          }
-        }
-    }
-    
-    private void organizeStations() // after stations error check , this code create station objects and send values to the that objects
-    {
-        index++; // to skip useless tokens
-        for (int i = index; i < tokens.size(); i++) {
-           if(tokens.get(i).equals(":line:"))continue; // ignore the :line: its not in data its created by computer
-            if(tokens.get(i).equals("(")&& stationFinder == false)  //if station finder is not working and its start of stations values
-            {
-                String name = tokens.get(i+1);
-                float maxCapacity = (float)Double.parseDouble(tokens.get(i+2)); // check max capacity
-                boolean mutliFlag = false;
-                boolean fifoflag = false;
-                if(tokens.get(i+3).equals("Y")) mutliFlag = true; // check multiflag
-                if(tokens.get(i+4).equals("Y")) fifoflag = true; // check fifoflag
-                stations.add(new Station(name,maxCapacity,mutliFlag,fifoflag,0,0)); // create a station object and send it to arraylist
-                i = i + 4; // to skip useless tokens
-                stationFinder = true; // start stationFinder
-                continue;
-            }
-            if(stationFinder)
-            {
-                if(tokens.get(i).equals(")"))
+                if(tokens.get(i).startsWith("t"))
                 {
-                    
-                    try {
-                        tokens.get(i+4);
-                    } catch (Exception e) {
-                       jobFileErrorCheck();
-                        break;
+                    for (Task task : tasks) {
+                        if(task.getName().equals(tokens.get(i))) jobs.getLast().getTasks().add(new Task(task.getName(),task.getValue()));
                     }
-                    stationFinder = false;
                 }else
                 {
-                    try {
-                       float val = (float)Double.parseDouble(tokens.get(i)); //to check is token a digit
-                       // second
-                        stations.get(stations.size()-1).getDefaultTasks().getLast().setSpeed(val);// first
-                      
-                       try {
-                           
-                           float val2 = (float)Double.parseDouble(tokens.get(i+1)); //to check is token a digit
-                          
-                          stations.get(stations.size()-1).getDefaultTasks().getLast().setPlusMinus(val2);
-                           
-                       } catch (NumberFormatException e) {
-                           
-                       }
-                        
-                    } catch (NumberFormatException e) {
-                        
-                       for (Task task : tasks) {
-                  
-                   if(tokens.get(i).equals(task.getName())) // if its not digit send task object to stations object
-                   {
-                       stations.get(stations.size()-1).getDefaultTasks().add(new Task(task.getName(),task.getValue()));// first
-                   }
-                    }
-              }
+                    
+                    jobs.getLast().getTasks().getLast().setValue((float)Double.parseDouble(tokens.get(i)));
+                }
+            }
+            
+            
+        }
+    }
+    private void organizeStations() // after stations error check , this code create station objects and send values to the that objects
+    {
+        for (int i = index; i < tokens.size(); i++) {
+            if(tokens.get(i).equals("(")||tokens.get(i).equals(")")) continue;
+            if(tokens.get(i).equals(":line:"))
+            {
+                try {
+                tokens.get(i+4);
+                i = i + 2;
+                String name = tokens.get(i);
+                float maxCapacity = (float)Double.parseDouble(tokens.get(i+1)); // check max capacity
+                boolean mutliFlag = false;
+                boolean fifoflag = false;
+                if(tokens.get(i+2).equals("Y")) mutliFlag = true; // check multiflag
+                if(tokens.get(i+3).equals("Y")) fifoflag = true; // check fifoflag
+                stations.add(new Station(name,maxCapacity,mutliFlag,fifoflag,0,0));
+                i = i + 3;
+                } catch (Exception e) {
+                   jobFileErrorCheck();
+                    break;
                 }
                 
+            }else
+            {
+                
+                if(tokens.get(i).startsWith("t"))
+                {
+                    for (Task task : tasks) {
+                        if(task.getName().equals(tokens.get(i)))
+                        {
+                           
+                            stations.getLast().getDefaultTasks().add(new Task(task.getName(),task.getValue()));
+                            break;
+                        }
+                    }
+                }else
+                {
+                  
+                   stations.getLast().getDefaultTasks().getLast().setSpeed((float)Double.parseDouble(tokens.get(i)));
+                   if(!tokens.get(i+1).startsWith("t"))
+                   {
+                       i++;
+                       try {
+                           stations.getLast().getDefaultTasks().getLast().setPlusMinus((float)Double.parseDouble(tokens.get(i)));
+                       } catch (Exception e) {
+                       }
+                       
+                   }
+                   
+                }
             }
         }
     }
@@ -205,31 +155,20 @@ public class Organizer {
     public ArrayList<Task> getTasks() {
         return tasks;
     }
-
-    public void setTasks(ArrayList<Task> tasks) {
-        this.tasks = tasks;
-    }
-
-    public ArrayList<JobType> getJobs() {
+    public ArrayList<JobType> getJobTypes() {
         return jobs;
     }
-
-    public void setJobs(ArrayList<JobType> jobs) {
-        this.jobs = jobs;
-    }
-
     public ArrayList<Station> getStations() {
         return stations;
     }
 
-    public void setStations(ArrayList<Station> stations) {
-        this.stations = stations;
+    public ArrayList<Job> getJobArrayList() {
+        return jobArrayList;
     }
     //*** END OF GET AND SET OBJECTS***
     private void taskErrorDetector() // this method check task errors
     {
-        
-        ArrayList<String> tasks2 = new ArrayList<String>(); //to check same tasks
+        ArrayList<String> tasks2 = new ArrayList<>(); //to check same tasks
        if(!tokens.get(1).equals("("))// check for (
        {
            System.out.println("**WORKFLOW FILE** " + "line: "+line + "( is missing");
@@ -247,15 +186,14 @@ public class Organizer {
                   line++;
                   continue;
                 }
-            
             if(tokens.get(i).equals("jobtypes")) // to end the code
             {
                 if(!tokens.get(i-1).equals("("))
                 {
-                    System.out.println("**WORKFLOW FILE** " + "line: "+line + "( is missing"); 
+                    System.out.println("**WORKFLOW FILE** " + "line: "+line + " ( is missing"); 
                     error = true;
                 }
-                if(!tokens.get(i-3).equals(")"))
+                if(!tokens.get(i-3).equals(")")&&!tokens.get(i-2).equals(")"))
                 {
                    System.out.println("**WORKFLOW FILE** " + "line: " +(line-1)+ ") is missing"); 
                    error = true;
@@ -263,24 +201,19 @@ public class Organizer {
                 index2 = i+1 ; // to skip useless tokens
                 break;
             }
-                try {
-                            
+                try {      
                      float val = (float)Double.parseDouble(tokens.get(i)); // check is it digit 
                      if(val<0)
                      {
                          System.out.println("**WORKFLOW FILE** " + "line: "+line+ " " + tokens.get(i) + " value of task is smaller than 0 ");
                          error = true;
-                         continue;
                      }
-                     
-                        
                     } catch (NumberFormatException e) {
                      
                        if(tasks2.contains(tokens.get(i))) // if it is not digit start this code
                        {
                            error = true;
                            System.out.println("**WORKFLOW FILE** " + "line: "+line+ " " + tokens.get(i) + " is already defined");
-                           continue;
                        }else
                        {
                            if(tokens.get(i).equals("(")||tokens.get(i).equals(")")) continue;
@@ -292,14 +225,9 @@ public class Organizer {
                                error = true;
                                System.out.println("**WORKFLOW FILE** " + "Line " + line + " this task type is invalid \"" + tokens.get(i) + "\" pls change the name" );
                            }
- 
-                       }
-                        
+                       } 
                     }
-                
-               
         }
-        
         error(error,"task"); // start error method
         if(!error)
         {
@@ -309,7 +237,7 @@ public class Organizer {
     
     private void jobErrorDetector()
     {
-         ArrayList<String> jobs2 = new ArrayList<String>();
+         ArrayList<String> jobs2 = new ArrayList<>();
         for (int i = index2; i < tokens.size(); i++) {
           
                 if(!newLine)
@@ -416,7 +344,6 @@ public class Organizer {
     }
     private void StationErrorDetector()
     {
-        String stationName = "";
         //start with line 7
         ArrayList<String> stations2 = new ArrayList<String>();
         ArrayList<String> tmpTask = new ArrayList<String>();
@@ -437,7 +364,6 @@ public class Organizer {
                         error = true;
                         
                     }
-                  stationName = tokens.get(index2);
                   index2++;
 
         for (int i = index2; i < tokens.size(); i++) {
@@ -506,7 +432,6 @@ public class Organizer {
                            error = true;
                        }
                      }
-                      continue;
                 }
                 }else
             {
@@ -572,12 +497,10 @@ public class Organizer {
                                      }
                                      if(defined) break;
                                  }
-                                     if(!defined) System.out.println("**WORKFLOW FILE** " + task.getName()+" is defined but you did not use it be carefull");
+                                     if(!defined) System.out.println("**WORKFLOW FILE** " + task.getName()+" is defined but you did not use it be careful");
                                  }
                                  organizeStations();
                              }
-                             
-                             
                          break;
                   }
                   newLine = false;
@@ -614,8 +537,6 @@ public class Organizer {
                                System.out.println("**WORKFLOW FILE** " + "line : " + line + " task : " + tokens.get(i)+ " is not defined at tasktypes ");
                                error = true;
                           }
-                    
-                
                 }
             }
             
@@ -625,12 +546,9 @@ public class Organizer {
     
     private void error(boolean error, String text)
     {
-        if(error) System.err.println("Before start the program or see other errors pls fix "+ text + " errors"+
-                "\ndo not forget these errors only "+ text+" errors, there may be more errors in other variables");
+        if(error) System.err.println("Before start the program or see other errors pls fix "+ text + " errors"+"\ndo not forget these errors only "+ text+" errors, there may be more errors in other variables");      
     }
-    
     //*** End of the workflow file methods**//
-    
     private void jobOrganizer()
     {
         boolean jobFinder = false;
@@ -662,22 +580,15 @@ public class Organizer {
                      jobArrayList.get(jobArrayList.size()-1).setStartTime((float)Double.parseDouble(jobTokens.get(i)));
                      i++;
                      jobArrayList.get(jobArrayList.size()-1).setDuration((float)Double.parseDouble(jobTokens.get(i)));
-                     
                  }
              }
-             
         }
-            
-        
     }
-    
     private void jobFileErrorCheck()
     {
-        typeFinder = false;
         line = 1;
         ArrayList<String> jobStrings = new ArrayList<>();
         for (int i = 0; i < jobTokens.size(); i++) {
-            
             if(jobTokens.get(i).equals(":line:"))
             {
                 line++;
@@ -687,7 +598,6 @@ public class Organizer {
                     jobStrings.add(jobTokens.get(i));
                 }else
                 {
-                    // to do warn
                     error = true;
                     System.out.println("**JOB FILE** " + "Line "+ line + ": you already defined " + jobTokens.get(i));
                 }
@@ -704,9 +614,7 @@ public class Organizer {
                 {
                     error = true;
                      System.out.println("**JOB FILE** " + "Line "+ line + ": you did not define " + jobTokens.get(i) + " in jobtypes");
-                    //to do warn
                 }
-                
             }else
             {
                 try {
@@ -715,17 +623,13 @@ public class Organizer {
                     {
                          System.out.println("**JOB FILE** " + "Line "+ line + ": "+ jobTokens.get(i) + " is negative");
                          error = true;
-                        // to do val is negativ
                     }
                 } catch (Exception e) {
                     
-                    // to do 
                     error = true;
                      System.out.println("**JOB FILE** " + "Line "+ line +": " + jobTokens.get(i) + " is not number");
                 }
-            }
-            
-            
+            } 
         }
         if(!error)
         {
