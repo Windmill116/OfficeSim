@@ -45,6 +45,8 @@ public class Parser{
         String line = readLine(this.reader);
         
         while(line != null){
+            if("\n".equals(line))
+                continue;
             tokens.add(":line:");
 
             //Split line into pre-tokens
@@ -57,7 +59,7 @@ public class Parser{
                 /*Build a token char by char*/
                 for(char s2: s.toCharArray()){
 
-                    if(Character.isISOControl(s2))
+                    if(Character.isISOControl(s2) || s2 == '\n' )
                         continue;
 
                     /*If char is (  or ) add another token */
