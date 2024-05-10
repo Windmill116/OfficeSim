@@ -8,7 +8,7 @@ public class Organizer {
   private ArrayList<Station> stations = new ArrayList<>(); // define stations array list
   private ArrayList<String> jobTokens; // in data from const
   private ArrayList<Job> jobArrayList = new ArrayList<>();//job array list defined
-  private int index = 0, index2 = 0, line = 1, maxLine; // int defined
+  private int index = 0, index2 = 0, line = 1, maxLine, parantheses = 0; // int defined
   private boolean newLine = false, error, jobtypesB = false, stationTypesB = false; // booleans defined
   public Organizer(ArrayList<String> tokens, int maxLine,ArrayList<String> jobTokens) { // Constructor
     this.tokens = tokens; // for tokens
@@ -402,6 +402,14 @@ public class Organizer {
                 if (!defined)
                   System.out.println("**WORKFLOW FILE** " + task.getName() + " is defined but you did not use it be careful");
               }
+                for (String token : tokens) {
+                   if(token.equals("(")||token.equals(")"))  parantheses++;
+                }
+                if((parantheses%2)>0)
+                {
+                    error = true;
+                    System.out.println("**WORKFLOW FILE** " + "you used extra brackets, this may cause an error pls fix it before start the program");
+                }
               organizeStations();
             }
             break;
