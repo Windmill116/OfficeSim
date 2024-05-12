@@ -214,11 +214,54 @@ class FrontendWorkflow{
             }
         }
     }
-    void EventAdder(Object task){
-        if(task instanceof AddTaskEvent){
-            
+
+    void extractJobEventsFromJobList(){
+        Collections.sort(jobs, new JobComparator());
+        for(tempJob job : jobs){
+            QueueJobEvent event = new QueueJobEvent(job.startTime,job);
+            EventAdder(event);
         }
     }
+
+    void extractTaskEventsFromJob(tempJob job){
+        System.out.println("For Job: " + job.getName());
+        for(Task t : job.getTasks()){
+            Station s = getTheFreeStationByTask(t);
+            ArrayList<Task> freeStationChannel = s.getFreeChannel();
+            AddTaskEvent event = new AddTaskEvent(job.getStartTime(),getTaskFromStationByName(t, s),s,freeStationChannel);
+            EventAdder(event);
+        }
+    }
+
+    void EventAdder(Object event){
+        eventList.add(event);
+    }
+
+    void HandleEvents(){
+        ArrayList<Object> waitingEventList = (ArrayList)eventList.clone();
+        for(Object event : waitingEventList){
+            switch(event.getClass().getSimpleName()){
+                case "AddTaskEvent":
+                    break;
+                case "RemoveTaskEvent":
+                    break;
+                case "QueueJobEvent":
+                    QueueJobEvent queueJobEvent = (QueueJobEvent)event;
+                    //First things first the jobs should queue, then the tasks.
+                    extractTaskEventsFromJob(queueJobEvent.getJob());
+                    break;
+                case "FinishJobEvent":
+                    break;
+            }
+
+        }
+        Collections.sort(eventList, new EventComparator());
+        System.out.println(eventList.toString());
+    }
+
+    //on getTaskFromStationByName we get the task from the station by the name of the given task parameter,
+    //we make a new task and we set it to station's 
+    //then we set the value of the task to job files value.
 
     Task getTaskFromStationByName(Task t, Station s){
         ArrayList<Task> tasks = s.getDefaultTasks();
@@ -336,6 +379,34 @@ class JobComparator implements Comparator<tempJob> {
             return -1;
         }else{
             return 1;
+        }
+    }
+}
+
+class EventComparator implements Comparator<Object> {
+    public int compare(Object o1, Object o2) {
+        
+        if(o1 instanceof AddTaskEvent){
+            AddTaskEvent e1 = (AddTaskEvent)o1;
+            if(e1.getTime()==e2.getTime()){
+                return 0;
+            }else if(e1.getTime()<e2.getTime()){
+                return -1;
+            }else{
+                return 1;
+            }
+        }else if(o1 instanceof QueueJobEvent){
+            QueueJobEvent e1 = (QueueJobEvent) o1;
+            QueueJobEvent e2 = (QueueJobEvent) o2;
+            if(e1.getTime()==e2.getTime()){
+                return 0;
+            }else if(e1.getTime()<e2.getTime()){
+                return -1;
+            }else{
+                return 1;
+            }
+        }else {
+            return 0;
         }
     }
 }
