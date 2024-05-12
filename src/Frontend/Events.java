@@ -1,11 +1,21 @@
 package Frontend;
 import Parser.*;
+import java.util.*;
 
-class AddTaskEvent{
+
+abstract class EventTemplate implements Comparable<EventTemplate>{
     int time;
+
+    @Override
+    public int compareTo(EventTemplate o) {
+        return Integer.compare(this.time, o.time);
+    }
+}
+
+class AddTaskEvent extends EventTemplate{
     Task task;
     Station targetStation;
-    int targetChannel;
+    ArrayList<Task> targetChannel;
 
     public int getTime() {
         return time;
@@ -55,6 +65,11 @@ class AddTaskEvent{
     AddTaskEvent(){
         
     }
+
+    @Override
+    public String toString() {
+        return ("Name: " + task.getName() + " Time: " + time + " Station: " + targetStation.getName());
+    }
 }
 class RemoveTaskEvent{
     Task task;
@@ -64,13 +79,21 @@ class RemoveTaskEvent{
     }
 }
 
-class QueueJobEvent{
-    Job job;
-    int time;
+class QueueJobEvent extends EventTemplate{
+    tempJob job;
 
-    QueueJobEvent(Job job, int time){
+    QueueJobEvent(tempJob job, int time){
         this.job = job;
         this.time = time;
+    }
+
+    public tempJob getJob() {
+        return job;
+    }
+
+    @Override
+    public String toString() {
+        return ("Job: " + job.getName() + " Time: " + time);
     }
 }
 
