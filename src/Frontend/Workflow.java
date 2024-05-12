@@ -247,9 +247,11 @@ class FrontendWorkflow{
         eventList.add(event);
         eventTemplates.add(event);
     }
-
+    
     void HandleEvents(){
-        ArrayList<EventTemplate> waitingEventList = (ArrayList)eventTemplates.clone();
+        
+        @SuppressWarnings("unchecked")
+        ArrayList<EventTemplate> waitingEventList = (ArrayList)eventTemplates.clone();//concurrent modification fix.
         for(EventTemplate event : waitingEventList){
             switch(event.getClass().getSimpleName()){
                 case "AddTaskEvent":
