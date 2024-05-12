@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import Parser.*;
+import Frontend.*;
 import Time.*;
 
 /*NOTES
@@ -58,6 +59,10 @@ class FrontendWorkflow{
     ArrayList<Task> testTasks;
     ArrayList<JobType> testJobTypes;
     ArrayList<Station> testStations;
+
+    ArrayList<Object> eventList = new ArrayList<>();
+
+    ArrayList<EventTemplate> eventTemplates = new ArrayList<EventTemplate>();
 
     Organizer organizer;
     public FrontendWorkflow(Organizer organizer){
@@ -198,6 +203,7 @@ class FrontendWorkflow{
 
     
     void WorkflowManager(){
+        /* 
         System.out.println("In Workflow Manager.");
         for(tempJob job : jobs){
             System.out.println("For Job: " + job.getName());
@@ -213,12 +219,16 @@ class FrontendWorkflow{
                 }
             }
         }
+        */
+
+        extractJobEventsFromJobList();
+        HandleEvents();
     }
 
     void extractJobEventsFromJobList(){
         Collections.sort(jobs, new JobComparator());
         for(tempJob job : jobs){
-            QueueJobEvent event = new QueueJobEvent(job.startTime,job);
+            QueueJobEvent event = new QueueJobEvent(job,job.startTime);
             EventAdder(event);
         }
     }
@@ -233,13 +243,16 @@ class FrontendWorkflow{
         }
     }
 
-    void EventAdder(Object event){
+    void EventAdder(EventTemplate event){
         eventList.add(event);
+        eventTemplates.add(event);
     }
-
+    
     void HandleEvents(){
-        ArrayList<Object> waitingEventList = (ArrayList)eventList.clone();
-        for(Object event : waitingEventList){
+        
+        @SuppressWarnings("unchecked")
+        ArrayList<EventTemplate> waitingEventList = (ArrayList)eventTemplates.clone();//concurrent modification fix.
+        for(EventTemplate event : waitingEventList){
             switch(event.getClass().getSimpleName()){
                 case "AddTaskEvent":
                     break;
@@ -255,8 +268,10 @@ class FrontendWorkflow{
             }
 
         }
-        Collections.sort(eventList, new EventComparator());
-        System.out.println(eventList.toString());
+        Collections.sort(eventTemplates, new EventComparator());
+        for(EventTemplate e : eventTemplates){
+            System.out.println(e.toString());
+        }
     }
 
     //on getTaskFromStationByName we get the task from the station by the name of the given task parameter,
@@ -280,11 +295,11 @@ class tempJob{
     String name;
     JobType jobType;
     ArrayList<Task> tasks;
-    double startTime;
-    double duration;
+    int startTime;
+    int duration;
     int currentTaskIndex;
 
-    public tempJob(String name,JobType jobType,double startTime,double duration){
+    public tempJob(String name,JobType jobType,int startTime,int duration){
         this.name = name;
         this.jobType = jobType; 
         tasks = jobType.getTasks();
@@ -337,19 +352,19 @@ class tempJob{
         this.tasks = tasks;
     }
 
-    public double getStartTime() {
+    public int getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(double startTime) {
+    public void setStartTime(int startTime) {
         this.startTime = startTime;
     }
 
-    public double getDuration() {
+    public int getDuration() {
         return duration;
     }
 
-    public void setDuration(double duration) {
+    public void setDuration(int duration) {
         this.duration = duration;
     }
 
@@ -383,33 +398,14 @@ class JobComparator implements Comparator<tempJob> {
     }
 }
 
-class EventComparator implements Comparator<Object> {
-    public int compare(Object o1, Object o2) {
-        
-        if(o1 instanceof AddTaskEvent){
-            AddTaskEvent e1 = (AddTaskEvent)o1;
-            if(e1.getTime()==e2.getTime()){
-                return 0;
-            }else if(e1.getTime()<e2.getTime()){
-                return -1;
-            }else{
-                return 1;
-            }
-        }else if(o1 instanceof QueueJobEvent){
-            QueueJobEvent e1 = (QueueJobEvent) o1;
-            QueueJobEvent e2 = (QueueJobEvent) o2;
-            if(e1.getTime()==e2.getTime()){
-                return 0;
-            }else if(e1.getTime()<e2.getTime()){
-                return -1;
-            }else{
-                return 1;
-            }
-        }else {
-            return 0;
-        }
+class EventComparator implements Comparator<EventTemplate>{
+    @Override
+    public int compare(EventTemplate o1, EventTemplate o2) {
+        return o1.compareTo(o2);
     }
 }
+
+
 
 class SpecializedTask{
     Task task;
