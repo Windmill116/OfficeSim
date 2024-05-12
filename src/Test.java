@@ -19,9 +19,7 @@ public class Test {
             ArrayList<String> tokens = p.getTokens();
             ArrayList<String> jobTokens =  p.getJobTokens();
             
-            
-            
-            
+            Organizer organizer = new Organizer(tokens, p.getLine(), jobTokens);
             
         } catch (IOException e) {
             // TODO Auto-generated catch block

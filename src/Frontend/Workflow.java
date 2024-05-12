@@ -1,10 +1,11 @@
 package Frontend;
 import java.util.*;
+
+
 import java.io.FileReader;
 import java.io.IOException;
 
 import Parser.*;
-import Frontend.*;
 import Time.*;
 
 /*NOTES
@@ -59,9 +60,6 @@ class FrontendWorkflow{
     ArrayList<Station> testStations;
 
     Organizer organizer;
-
-    ArrayList<Object> eventList = new ArrayList<Object>();
-
     public FrontendWorkflow(Organizer organizer){
         this.organizer = organizer;
         getArraysFromOrganizer(organizer);
@@ -77,7 +75,7 @@ class FrontendWorkflow{
         //jobs = organizer.getJobs();
         createTestObjects();
         jobs = testJobs;
-        jobTypes = organizer.getJobs();
+        jobTypes = organizer.getJobTypes();
         
         stations = organizer.getStations();
 
@@ -200,9 +198,6 @@ class FrontendWorkflow{
 
     
     void WorkflowManager(){
-        extractJobEventsFromJobList();
-        HandleEvents();
-        /* 
         System.out.println("In Workflow Manager.");
         for(tempJob job : jobs){
             System.out.println("For Job: " + job.getName());
@@ -212,16 +207,12 @@ class FrontendWorkflow{
                     ArrayList<Task> freeStationChannel = s.getFreeChannel();
                     freeStationChannel.add(getTaskFromStationByName(t, s));
                     System.out.println(t.getName() + " " + getTaskFromStationByName(t, s).getSpeed() + " " + s.getName() + " Multi Channel Station. Tasks in line: " + freeStationChannel.size() );
-
-                    AddTaskEvent event = new AddTaskEvent(job.getStartTime(),getTaskFromStationByName(t, s),s,freeStationChannel);
-                    EventAdder(event);
                 }else{
                     s.getTaskChannels().get(0).add(t);
                     System.out.println("  " + t.getName() + " " + getTaskFromStationByName(t, s).getSpeed() + " "+ s.getName() + " Single Channel Station. Tasks in line: "+s.getTaskChannels().get(0).size());
                 }
             }
         }
-        */
     }
 
     void extractJobEventsFromJobList(){
@@ -276,7 +267,7 @@ class FrontendWorkflow{
         ArrayList<Task> tasks = s.getDefaultTasks();
         for(Task sTask : tasks){
             if(sTask.getName().toUpperCase().equals(t.getName())){
-                Task t1 = (Task) sTask.clone();
+                Task t1 = sTask;
                 t1.setValue(t.getValue());
                 return t1;
             }
@@ -289,11 +280,11 @@ class tempJob{
     String name;
     JobType jobType;
     ArrayList<Task> tasks;
-    int startTime;
+    double startTime;
     double duration;
     int currentTaskIndex;
 
-    public tempJob(String name,JobType jobType,int startTime,double duration){
+    public tempJob(String name,JobType jobType,double startTime,double duration){
         this.name = name;
         this.jobType = jobType; 
         tasks = jobType.getTasks();
@@ -346,11 +337,11 @@ class tempJob{
         this.tasks = tasks;
     }
 
-    public int getStartTime() {
+    public double getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(int startTime) {
+    public void setStartTime(double startTime) {
         this.startTime = startTime;
     }
 
