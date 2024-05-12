@@ -238,7 +238,6 @@ class FrontendWorkflow{
             Station s = getTheFreeStationByTask(t);
             ArrayList<Task> freeStationChannel = s.getFreeChannel();
             AddTaskEvent event = new AddTaskEvent(job.getStartTime(),getTaskFromStationByName(t, s),s,freeStationChannel);
-            
             EventAdder(event);
         }
     }
@@ -248,7 +247,8 @@ class FrontendWorkflow{
     }
 
     void HandleEvents(){
-        for(Object event : eventList){
+        ArrayList<Object> waitingEventList = (ArrayList)eventList.clone();
+        for(Object event : waitingEventList){
             switch(event.getClass().getSimpleName()){
                 case "AddTaskEvent":
                     break;
@@ -264,7 +264,7 @@ class FrontendWorkflow{
             }
 
         }
-
+        Collections.sort(eventList, new EventComparator());
         System.out.println(eventList.toString());
     }
 
@@ -388,6 +388,34 @@ class JobComparator implements Comparator<tempJob> {
             return -1;
         }else{
             return 1;
+        }
+    }
+}
+
+class EventComparator implements Comparator<Object> {
+    public int compare(Object o1, Object o2) {
+        
+        if(o1 instanceof AddTaskEvent){
+            AddTaskEvent e1 = (AddTaskEvent)o1;
+            if(e1.getTime()==e2.getTime()){
+                return 0;
+            }else if(e1.getTime()<e2.getTime()){
+                return -1;
+            }else{
+                return 1;
+            }
+        }else if(o1 instanceof QueueJobEvent){
+            QueueJobEvent e1 = (QueueJobEvent) o1;
+            QueueJobEvent e2 = (QueueJobEvent) o2;
+            if(e1.getTime()==e2.getTime()){
+                return 0;
+            }else if(e1.getTime()<e2.getTime()){
+                return -1;
+            }else{
+                return 1;
+            }
+        }else {
+            return 0;
         }
     }
 }
