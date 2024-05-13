@@ -25,7 +25,7 @@ public class Parser{
         String line = null;
         try {
             if(reader.ready())
-                line = reader.readLine();
+                line = reader.readLine().trim();
             else
                 return null;
             
@@ -43,10 +43,13 @@ public class Parser{
     
     private int workflowTokenizer(){
         String line = readLine(this.reader);
-        
+        line = line.replaceAll("\\p{C}", "");       //Delete non-printable characters (Organizer just works with full lines)
         while(line != null){
-            if("\n".equals(line))
+            if(line.length() <= 0){                                 //If line is empty, switch to next line
+                line = readLine(this.reader);
                 continue;
+            }
+
             tokens.add(":line:");
 
             //Split line into pre-tokens
@@ -102,8 +105,13 @@ public class Parser{
     private int jobFileReader()
     {
         String line = readLine(jobFileReader);
+        line = line.replaceAll("\\p{C}", "");       //Delete all non-printable characters (Otherwise they may assumed as a new line)
         
         while(line != null){
+            if(line.length() <= 0){                                 //If line is empty, switch to next line
+                line = readLine(this.jobFileReader);
+                continue;
+            }
             jobTokens.add(":line:");
 
             //Split line into pre-tokens
