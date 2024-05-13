@@ -13,9 +13,9 @@ abstract class EventTemplate implements Comparable<EventTemplate>{
 }
 
 class AddTaskEvent extends EventTemplate{
-    Task task;
-    Station targetStation;
-    ArrayList<Task> targetChannel;
+    private Task task;
+    private Station targetStation;
+    private ArrayList<Task> targetChannel;
 
     public int getTime() {
         return time;
@@ -54,6 +54,8 @@ class AddTaskEvent extends EventTemplate{
         this.task = task;
         this.targetStation = targetStation;
         this.targetChannel = targetChannel;
+
+
     }
 
     AddTaskEvent(int time,Task task, Station targetStation){
@@ -68,7 +70,8 @@ class AddTaskEvent extends EventTemplate{
 
     @Override
     public String toString() {
-        return ("Name: " + task.getName() + " Time: " + time + " Station: " + targetStation.getName());
+        //return ("Name: " + task.getName() + " Time: " + time + " Station: " + targetStation.getName());
+        return ("Executed task is " + task.getName() + " on " + time + " at the station " + targetStation.getName() + " in a channel with " + targetChannel.size() + " tasks in queue.");
     }
 }
 class RemoveTaskEvent{
