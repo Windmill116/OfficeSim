@@ -1,2 +1,7 @@
 *.class
 *DS_Store
+src/job.txt
+src/Parser/job.txt
+src/Parser/Ptest.java
+src/Parser/test.txt
+src/test.txt
