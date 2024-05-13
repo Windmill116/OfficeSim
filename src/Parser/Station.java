@@ -110,7 +110,7 @@ public class Station {
     }
 
     public ArrayList<Task> getFreeChannel(){
-        ArrayList<ArrayList<Task>> allChannels = taskChannels;
+        ArrayList<ArrayList<Task>> allChannels = (ArrayList)taskChannels.clone();
         Collections.sort(allChannels, new ChannelComparator());
         return allChannels.get(0);
     }

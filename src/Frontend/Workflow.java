@@ -252,9 +252,13 @@ class FrontendWorkflow{
         
         @SuppressWarnings("unchecked")
         ArrayList<EventTemplate> waitingEventList = (ArrayList)eventTemplates.clone();//concurrent modification fix.
+        /* 
         for(EventTemplate event : waitingEventList){
             switch(event.getClass().getSimpleName()){
                 case "AddTaskEvent":
+                    AddTaskEvent addTaskEvent = (AddTaskEvent)event;
+                    Task task = addTaskEvent.getTask();
+                    addTaskEvent.getTargetChannel().add(task);
                     break;
                 case "RemoveTaskEvent":
                     break;
@@ -266,11 +270,52 @@ class FrontendWorkflow{
                 case "FinishJobEvent":
                     break;
             }
+            
 
         }
+        */
+        
+        int queueCount = 0;
+        EventTemplate currentEvent;
+        while(true){
+            currentEvent = eventTemplates.get(queueCount);
+            switch(currentEvent.getClass().getSimpleName()){
+                case "AddTaskEvent":
+                    AddTaskEvent addTaskEvent = (AddTaskEvent)currentEvent;
+                    Task task = addTaskEvent.getTask();
+                    addTaskEvent.getTargetChannel().add(task);
+                    System.out.println("Task: " + task.getName() + " is added to the queue of " + addTaskEvent.getTargetChannel().size() + " at channel " + addTaskEvent.getTargetStation().getTaskChannels().indexOf(addTaskEvent.getTargetChannel()));
+                    break;
+                case "RemoveTaskEvent":
+                    break;
+                case "QueueJobEvent":
+                    QueueJobEvent queueJobEvent = (QueueJobEvent)currentEvent;
+                    //First things first the jobs should queue, then the tasks.
+                    extractTaskEventsFromJob(queueJobEvent.getJob());
+                    break;
+                case "FinishJobEvent":
+                    break;
+            }
+            Collections.sort(eventTemplates, new EventComparator());
+            
+
+            if(queueCount + 1 == eventList.size()) break;
+            queueCount++;
+        }
+
+
+
         Collections.sort(eventTemplates, new EventComparator());
         for(EventTemplate e : eventTemplates){
             System.out.println(e.toString());
+        }
+
+        for(Station s : stations){
+            System.out.print("At station " + s.getName() + " Channel queues ");
+            for(ArrayList<Task> i : s.getTaskChannels()){
+                System.out.print(i.size() + " ");
+            }
+            System.out.println();
         }
     }
 
