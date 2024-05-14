@@ -5,8 +5,10 @@ public class Task {
     
     private String name;
     private float value;
-   private  float speed;
+    private float speed;
     private float plusMinus;
+    private float duration;
+
     public Task(String name, float value) {
         this.name = name;
         this.value = value;
@@ -56,6 +58,13 @@ public class Task {
         this.plusMinus = plusMinus;
     }
     
+    public float getDuration(){
+        return duration;
+    }
+
+    public void setDuration(float duration) {
+        this.duration = duration;
+    }
     
     
     
