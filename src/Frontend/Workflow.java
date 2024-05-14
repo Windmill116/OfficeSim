@@ -98,7 +98,7 @@ class FrontendWorkflow{
         Job5 J3 10 30 */
 
         testTasks= new ArrayList<>();
-        testTasks.add(new Task("T1",1));
+        testTasks.add(new Task("T1",10));
         testTasks.add(new Task("T2",2));
         testTasks.add(new Task("T3",2.5f));
         testTasks.add(new Task("T5",4));
@@ -200,8 +200,7 @@ class FrontendWorkflow{
         }
         return usableStations.get(0); //might add strategic selection later. That's why there is more than one usables added.
     }
-
-    
+  
     void WorkflowManager(){
         /* 
         System.out.println("In Workflow Manager.");
@@ -235,16 +234,21 @@ class FrontendWorkflow{
 
     void extractTaskEventsFromJob(tempJob job){
         System.out.println("For Job: " + job.getName());
+
         for(Task t : job.getTasks()){
+            System.out.println("For job " + t.getName());
             Station s = getTheFreeStationByTask(t);
             ArrayList<Task> freeStationChannel = s.getFreeChannel();
+            Task currentTask = getTaskFromStationByName(t, s);
+            currentTask.setDuration(currentTask.getPlusMinus());
             AddTaskEvent event = new AddTaskEvent(job.getStartTime(),getTaskFromStationByName(t, s),s,freeStationChannel);
             EventAdder(event);
         }
+
+        
     }
 
     void EventAdder(EventTemplate event){
-        eventList.add(event);
         eventTemplates.add(event);
     }
     
@@ -278,28 +282,44 @@ class FrontendWorkflow{
         int queueCount = 0;
         EventTemplate currentEvent;
         while(true){
+            if(eventTemplates.get(queueCount).isDone()) queueCount++;
             currentEvent = eventTemplates.get(queueCount);
             switch(currentEvent.getClass().getSimpleName()){
                 case "AddTaskEvent":
+                    System.out.println("AddTaskEvent " + currentEvent.hashCode());
                     AddTaskEvent addTaskEvent = (AddTaskEvent)currentEvent;
                     Task task = addTaskEvent.getTask();
                     addTaskEvent.getTargetChannel().add(task);
                     System.out.println("Task: " + task.getName() + " is added to the queue of " + addTaskEvent.getTargetChannel().size() + " at channel " + addTaskEvent.getTargetStation().getTaskChannels().indexOf(addTaskEvent.getTargetChannel()));
+                    addTaskEvent.setDone(true);
+
                     break;
                 case "RemoveTaskEvent":
+                    System.out.println("Remove task");
+                    RemoveTaskEvent removeTaskEvent = (RemoveTaskEvent)currentEvent;
+                    removeTaskEvent.setDone(true);
+                    Task currentTask = removeTaskEvent.getTask();
+                    removeTaskEvent.getTargetChannel().remove(currentTask);
+                    Task nextTask = removeTaskEvent.getTargetChannel().getFirst();
+
+                    if(nextTask != null){
+                        RemoveTaskEvent nextTaskEvent = new RemoveTaskEvent(nextTask, removeTaskEvent.getTargetStation(), removeTaskEvent.getTargetChannel(), removeTaskEvent.getTime());
+                        EventAdder(nextTaskEvent);
+                    }
                     break;
                 case "QueueJobEvent":
+                    System.out.println("QueueJobEvent");
                     QueueJobEvent queueJobEvent = (QueueJobEvent)currentEvent;
                     //First things first the jobs should queue, then the tasks.
                     extractTaskEventsFromJob(queueJobEvent.getJob());
+                    queueJobEvent.setDone(true);
                     break;
                 case "FinishJobEvent":
                     break;
             }
-            Collections.sort(eventTemplates, new EventComparator());
-            
 
-            if(queueCount + 1 == eventList.size()) break;
+            Collections.sort(eventTemplates, new EventComparator());
+            if(queueCount + 1 == eventTemplates.size()) break;
             queueCount++;
         }
 
@@ -307,7 +327,7 @@ class FrontendWorkflow{
 
         Collections.sort(eventTemplates, new EventComparator());
         for(EventTemplate e : eventTemplates){
-            System.out.println(e.toString());
+            System.out.println(e.toString()  + " "+ e.hashCode());
         }
 
         for(Station s : stations){
@@ -447,41 +467,6 @@ class EventComparator implements Comparator<EventTemplate>{
     @Override
     public int compare(EventTemplate o1, EventTemplate o2) {
         return o1.compareTo(o2);
-    }
-}
-
-
-
-class SpecializedTask{
-    Task task;
-    float speed;
-    float randomness = 0;
-
-    public SpecializedTask(Task task, float speed){
-        this.task=task;
-        this.speed=speed;
-    }
-
-    public SpecializedTask(Task task, float speed, float randomness){
-        this.task=task;
-        this.speed=speed;
-        this.randomness=randomness;
-    }
-
-    public float getSpeed(){
-        return this.speed;
-    }
-
-    public void setSpeed(float speed){
-        this.speed=speed;
-    }
-
-    public Task getTask(){
-        return this.task;
-    }
-
-    public void setTask(Task task){
-        this.task=task;
     }
 }
 
