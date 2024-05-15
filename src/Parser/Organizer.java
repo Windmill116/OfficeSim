@@ -125,19 +125,7 @@ public class Organizer {
       }
     }
   }
-  public ArrayList<Task> getTasks() { //*** START OF GET AND SET OBJECTS***
-    return tasks;
-  }
-  public ArrayList<JobType> getJobTypes() {
-    return jobs;
-  }
-  public ArrayList<Station> getStations() {
-    return stations;
-  }
-
-  public ArrayList<Job> getJobArrayList() {
-    return jobArrayList;
-  }
+  
   //*** END OF GET AND SET OBJECTS***
   private void taskErrorDetector() // this method check task errors
   {
@@ -521,4 +509,16 @@ public class Organizer {
       error(error, "jobFile");
     }
   }
+    public ArrayList<Task> getTasks() {
+        return tasks;
+    }
+    public ArrayList<JobType> getJobTypes() {
+        return jobs;
+    }
+    public ArrayList<Station> getStations() {
+        return stations;
+    }
+    public ArrayList<Job> getJobs() {
+        return jobArrayList;
+    }
 }

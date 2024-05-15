@@ -75,7 +75,7 @@ class FrontendWorkflow{
     public void getArraysFromOrganizer(Organizer organizer){
         //jobs = organizer.getJobs();
         createTestObjects();
-        jobs = organizer.getJobArrayList();
+        jobs = organizer.getJobs();
         jobTypes = organizer.getJobTypes();
         
         stations = organizer.getStations();
