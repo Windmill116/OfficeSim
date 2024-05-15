@@ -1,5 +1,5 @@
-
 package Parser;
+import java.util.ArrayList;
 
 public class Job {
     
@@ -7,10 +7,12 @@ public class Job {
     private float startTime;
     private float duration;
     private String jobId;
+    ArrayList<Task> tasks = new ArrayList<Task>();
 
     public Job(String jobId,JobType jobType, float startTime, float duration) {
         this.jobId = jobId;
         this.jobType = jobType;
+        tasks = jobType.getTasks();
         this.startTime = startTime;
         this.duration = duration;
     }
@@ -47,10 +49,11 @@ public class Job {
         this.jobId = jobId;
     }
 
-    
-    
-    
-    
-    
-    
+    public String getName() {
+        return jobId;
+    }
+
+    public ArrayList<Task> getTasks(){
+        return tasks;
+    }
 }

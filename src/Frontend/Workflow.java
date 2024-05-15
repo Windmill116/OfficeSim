@@ -7,7 +7,6 @@ import java.io.IOException;
 
 import Parser.*;
 import Frontend.*;
-import Time.*;
 
 /*NOTES
  * 1- I will assume that the Jobs go one by one and tasks arent mixed but rather done Job by Job.
@@ -17,9 +16,6 @@ import Time.*;
 
 public class Workflow {
     static boolean testMode = false;
-    static enum EventType{
-        MESSAGE,REMOVE_TASK,QUEUE_TASK,ADD_TASK,FINISH_JOB,DO_JOB;
-    }
     public static void main(String[] args) {
         FrontendWorkflow testFrontendWorkflow;
         if(!testMode) {
@@ -50,7 +46,7 @@ public class Workflow {
 
 class FrontendWorkflow{
 
-    private ArrayList<tempJob> jobs;
+    private ArrayList<Job> jobs;
     private ArrayList<JobType> jobTypes;
     private ArrayList<Station> stations;
     private ArrayList<Task> tasks;
@@ -79,7 +75,7 @@ class FrontendWorkflow{
     public void getArraysFromOrganizer(Organizer organizer){
         //jobs = organizer.getJobs();
         createTestObjects();
-        jobs = testJobs;
+        jobs = organizer.getJobArrayList();
         jobTypes = organizer.getJobTypes();
         
         stations = organizer.getStations();
@@ -154,7 +150,7 @@ class FrontendWorkflow{
         testStations.get(2).setDefaultTasks(testStation3Tasks);
     }
     public void assignTestObjectsAsMain(){
-        jobs = testJobs;
+        //jobs = testJobs;
         tasks = testTasks;
         stations = testStations;
     }
@@ -162,7 +158,7 @@ class FrontendWorkflow{
         Collections.sort(inTasks, new TaskComparator());
         return inTasks;
     }
-    ArrayList<tempJob> sortJobsByStartTime(ArrayList<tempJob> inJobs){
+    ArrayList<Job> sortJobsByStartTime(ArrayList<Job> inJobs){
         Collections.sort(inJobs, new JobComparator());
         return inJobs;
     }
@@ -226,13 +222,13 @@ class FrontendWorkflow{
 
     void extractJobEventsFromJobList(){
         Collections.sort(jobs, new JobComparator());
-        for(tempJob job : jobs){
-            QueueJobEvent event = new QueueJobEvent(job,job.startTime);
+        for(Job job : jobs){
+            QueueJobEvent event = new QueueJobEvent(job,job.getStartTime());
             EventAdder(event);
         }
     }
 
-    void extractTaskEventsFromJob(tempJob job){
+    void extractTaskEventsFromJob(Job job){
         System.out.println("\nFor Job: " + job.getName());
 
         for(Task t : job.getTasks()){
@@ -240,15 +236,16 @@ class FrontendWorkflow{
             Station s = getTheFreeStationByTask(t);
             ArrayList<Task> freeStationChannel = s.getFreeChannel();
             Task currentTask = getTaskFromStationByName(t, s);
-            currentTask.setDuration(currentTask.getPlusMinus());
-            AddTaskEvent event = new AddTaskEvent(job.getStartTime(),getTaskFromStationByName(t, s),s,freeStationChannel);
+            System.out.println("got duration " + currentTask.getDuration());
+            AddTaskEvent event = new AddTaskEvent(job.getStartTime(),currentTask,s,freeStationChannel);
             EventAdder(event);
-
+            /* 
             if(freeStationChannel.size()==0){
                 System.out.println("Remove Task Event new first task: " + currentTask.getName());
                 RemoveTaskEvent removeTaskEvent = new RemoveTaskEvent(currentTask,s,freeStationChannel,0);
                 EventAdder(removeTaskEvent);
             }
+            */
         }
 
         
@@ -299,6 +296,8 @@ class FrontendWorkflow{
                     System.out.println("Task: " + task.getName() + " is added to the queue of " + addTaskEvent.getTargetChannel().size() + " at channel " + addTaskEvent.getTargetStation().getTaskChannels().indexOf(addTaskEvent.getTargetChannel()));
                     addTaskEvent.setDone(true);
 
+                    RemoveTaskEvent removeTaskEventOfTask = new RemoveTaskEvent(addTaskEvent.getTime() + task.getDuration(), task,addTaskEvent.getTargetStation(),addTaskEvent.getTargetChannel());
+                    EventAdder(removeTaskEventOfTask);
                     break;
                 case "RemoveTaskEvent":
                     
@@ -307,11 +306,19 @@ class FrontendWorkflow{
                     removeTaskEvent.setDone(true);
                     Task currentTask = removeTaskEvent.getTask();
                     removeTaskEvent.getTargetChannel().remove(currentTask);
+
+                    if(removeTaskEvent.getTargetChannel().size()==0)break;
+                    Task nextTask = removeTaskEvent.getTargetChannel().getFirst();
+                    AddTaskEvent nextAddTaskEvent = new AddTaskEvent(removeTaskEvent.getTime(), nextTask, removeTaskEvent.getTargetStation());
+                    System.out.println("Next event time: " + nextAddTaskEvent.getTime());
+
+                    /*
                     if(removeTaskEvent.getTargetChannel().size()!=0){
                         Task nextTask = removeTaskEvent.getTargetChannel().getFirst();
                         RemoveTaskEvent nextTaskEvent = new RemoveTaskEvent(nextTask, removeTaskEvent.getTargetStation(), removeTaskEvent.getTargetChannel(), removeTaskEvent.getTime());
                         EventAdder(nextTaskEvent);
                     }
+                    */
                     break;
                 case "QueueJobEvent":
                     System.out.println("QueueJobEvent");
@@ -330,14 +337,14 @@ class FrontendWorkflow{
         }
 
 
-
+        System.out.println();
         Collections.sort(eventTemplates, new EventComparator());
         for(EventTemplate e : eventTemplates){
             System.out.println(e.toString()  + " "+ e.hashCode());
         }
 
         for(Station s : stations){
-            System.out.print("At station " + s.getName() + " Channel queues ");
+            System.out.print("\n\nAt station " + s.getName() + " Channel queues ");
             for(ArrayList<Task> i : s.getTaskChannels()){
                 System.out.print(i.size() + " ");
             }
@@ -355,11 +362,13 @@ class FrontendWorkflow{
             if(sTask.getName().toUpperCase().equals(t.getName())){
                 Task t1 = sTask;
                 t1.setValue(t.getValue());
+                t1.calculateDuration();
                 return t1;
             }
         }
         return null;
     }
+
 }
 
 class tempJob{
@@ -368,7 +377,6 @@ class tempJob{
     ArrayList<Task> tasks;
     int startTime;
     int duration;
-    int currentTaskIndex;
 
     public tempJob(String name,JobType jobType,int startTime,int duration){
         this.name = name;
@@ -376,32 +384,12 @@ class tempJob{
         tasks = jobType.getTasks();
         this.startTime = startTime;
         this.duration = duration;
-        this.currentTaskIndex=0;
-    }
-
-    public Task getCurrentTask(){
-        return this.tasks.get(this.currentTaskIndex);
-    }
-
-    public Task getNextTask(){
-        return this.tasks.get(++this.currentTaskIndex);
-    }
-
-    public boolean hasNextTask(){
-        if(this.currentTaskIndex+1<=this.tasks.size()){
-            return true;
-        } else{
-            return false;
-        }
     }
 
     public Task getTask(int index){
         return this.tasks.get(index);
     }
 
-    public void resetCurrentTaskIndex(){
-        this.currentTaskIndex=0;
-    }
 
     public void addTask(Task t){
         tasks.add(t);
@@ -457,8 +445,8 @@ class TaskComparator implements Comparator<Task> {
     }
 }
 
-class JobComparator implements Comparator<tempJob> {
-    public int compare(tempJob job1, tempJob job2) {
+class JobComparator implements Comparator<Job> {
+    public int compare(Job job1, Job job2) {
         if(job1.getStartTime()==job2.getStartTime()){
             return 0;
         }else if(job1.getStartTime()<job2.getStartTime()){

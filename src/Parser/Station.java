@@ -114,6 +114,14 @@ public class Station {
         Collections.sort(allChannels, new ChannelComparator());
         return allChannels.get(0);
     }
+
+    public int getChannelCurrentDuration(ArrayList<Task> taskChannel){
+        int currentDuration = 0;
+        for(Task i : taskChannel){
+            currentDuration += i.getDuration();
+        }
+        return currentDuration;
+    }
 }
 
 class ChannelComparator implements Comparator<ArrayList<Task>>{

@@ -1,5 +1,6 @@
 
 package Parser;
+import java.util.Random;
 //made by Aykan Ugur all rights belong his t-shirt
 public class Task {
     
@@ -58,14 +59,17 @@ public class Task {
         this.plusMinus = plusMinus;
     }
     
-    public float getDuration(){
-        return duration;
+    public void calculateDuration(){
+        if(plusMinus!=0){
+            Random random = new Random(System.nanoTime());
+            Float num = random.nextFloat(1)*plusMinus + value/speed;
+            duration = num;
+        }else{
+            duration = value/speed;
+        }
     }
 
-    public void setDuration(float duration) {
-        this.duration = duration;
+    public float getDuration() {
+        return duration;
     }
-    
-    
-    
 }

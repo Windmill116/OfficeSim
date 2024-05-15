@@ -77,7 +77,7 @@ class AddTaskEvent extends EventTemplate{
     @Override
     public String toString() {
         //return ("Name: " + task.getName() + " Time: " + time + " Station: " + targetStation.getName());
-        return ("Added task is " + task.getName() + " on " + time + " at the station " + targetStation.getName() + " in a channel with " + targetChannel.size() + " tasks in queue.");
+        return ("Added task is " + task.getName()+ " with a duration of " + task.getDuration()+ " on " + time + " at the station " + targetStation.getName() + " in a channel with " + targetChannel.size() + " tasks in queue.");
     }
 }
 class RemoveTaskEvent extends EventTemplate{
@@ -118,6 +118,8 @@ class RemoveTaskEvent extends EventTemplate{
     }
 
     RemoveTaskEvent(Task task, Station targetStation, ArrayList<Task> targetChannel, float previousTime) {
+        
+        /* 
         if(targetStation.getPlusMinus()!=0){
             this.time = (Float) ((task.getPlusMinus()+1)*(task.getValue()/task.getSpeed()));
         }else{
@@ -126,6 +128,7 @@ class RemoveTaskEvent extends EventTemplate{
         }
 
         this.time += previousTime;
+        */
         this.task = task;
         this.targetStation = targetStation;
         this.targetChannel = targetChannel;
@@ -133,7 +136,8 @@ class RemoveTaskEvent extends EventTemplate{
 
     }
 
-    RemoveTaskEvent(float time,Task task, Station targetStation){
+    RemoveTaskEvent(float time,Task task, Station targetStation , ArrayList<Task> targetChannel){
+        this.targetChannel = targetChannel;
         this.time = time;
         this.task = task;
         this.targetStation = targetStation;
@@ -146,7 +150,7 @@ class RemoveTaskEvent extends EventTemplate{
     @Override
     public String toString() {
         //return ("Name: " + task.getName() + " Time: " + time + " Station: " + targetStation.getName());
-        return ("Removed task is " + task.getName() + " with a value of " + task.getValue() + " in speed of " + task.getSpeed() + " on " + time + " at the station " + targetStation.getName() + " in a channel with " + targetChannel.size() + " tasks in queue.");
+        return ("Removed task is " + task.getName() + " with a duration of " + task.getDuration() +  " on " + time + " at the station " + targetStation.getName() + " in a channel with " + targetChannel.size() + " tasks in queue.");
     }
 }
 
@@ -221,14 +225,14 @@ class ExecuteTaskEvent extends EventTemplate{
 }
 
 class QueueJobEvent extends EventTemplate{
-    tempJob job;
+    Job job;
 
-    QueueJobEvent(tempJob job, float time){
+    QueueJobEvent(Job job, float time){
         this.job = job;
         this.time = time;
     }
 
-    public tempJob getJob() {
+    public Job getJob() {
         return job;
     }
 
