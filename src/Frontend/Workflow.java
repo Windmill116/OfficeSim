@@ -77,8 +77,9 @@ class FrontendWorkflow{
     }
     public void getArraysFromOrganizer(Organizer organizer){
         //jobs = organizer.getJobs();
-        createTestObjects();
+
         jobs = organizer.getJobs();
+
         jobTypes = organizer.getJobTypes();
         
         stations = organizer.getStations();
@@ -87,9 +88,7 @@ class FrontendWorkflow{
         
         for (JobType jobType : jobTypes) {
             for (Task task : jobType.getTasks()) {
-                
                 System.out.println(task.getName());
-                
             }
         }
 
@@ -194,9 +193,8 @@ class FrontendWorkflow{
         for(Station s:stations){
             boolean canUseStation=false;
             for(Task sTask : s.getDefaultTasks()){
-                //System.out.println(sTask.getName()+ " " + t.getName());
-                if(sTask.getName().toUpperCase().equals(t.getName())){
-                    
+                System.out.println(sTask.getName()+ " " + t.getName());
+                if(sTask.getName().equals(t.getName())){
                     canUseStation=true;
                 }
             }
@@ -240,10 +238,10 @@ class FrontendWorkflow{
     }
 
     void extractTaskEventsFromJob(Job job){
-        System.out.println("\nFor Job: " + job.getName());
+        
 
         for(Task t : job.getTasks()){
-            System.out.println("For job " + t.getName());
+            System.out.println("\nFor Job: " + job.getName());
             Station s = getTheFreeStationByTask(t);
             ArrayList<Task> freeStationChannel = s.getFreeChannel();
             Task currentTask = getTaskFromStationByName(t, s);
@@ -370,7 +368,7 @@ class FrontendWorkflow{
     Task getTaskFromStationByName(Task t, Station s){
         ArrayList<Task> tasks = s.getDefaultTasks();
         for(Task sTask : tasks){
-            if(sTask.getName().toUpperCase().equals(t.getName())){
+            if(sTask.getName().equals(t.getName())){
                 Task t1 = sTask;
                 t1.setValue(t.getValue());
                 t1.calculateDuration();
