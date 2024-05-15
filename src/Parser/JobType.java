@@ -18,11 +18,6 @@ public class JobType {
         this.tasks = tasks;
         this.name = name;
     }
-     
-    
-    
-    
-
     public ArrayList<Task> getTasks() {
         return tasks;
     }

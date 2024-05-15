@@ -439,31 +439,26 @@ public class Organizer {
       System.err.println("Before start the program or see other errors pls fix " + text + " errors"+ "\ndo not forget these errors only " + text + " errors, there may be more errors in other variables");
   }//*** End of the workflow file methods**//
   private void jobOrganizer() {
-    boolean jobFinder = false;
-    for (int i = 0; i < jobTokens.size(); i++) {
-      if (jobTokens.get(i).equals(":line:") && !jobFinder) {
-        i++;
-        jobArrayList.add(new Job(jobTokens.get(i), null, -1, -1));
-        break;
+      for (int i = 0; i < jobTokens.size(); i++) {
+         if(jobTokens.get(i).equals(":line:"))
+         {
+             i++;
+             jobArrayList.add(new Job(jobTokens.get(i),null,-1,-1));
+         }else
+         {
+             for (JobType jobType : jobs) {
+                 if(jobType.getName().equals(jobTokens.get(i)))
+                 {
+                     jobArrayList.getLast().setJobType(new JobType(jobType.getTasks(),jobType.getName()));
+                     i++;
+                     break;
+                 }
+             }
+            jobArrayList.get(jobArrayList.size() - 1).setStartTime((float) Double.parseDouble(jobTokens.get(i)));
+            i++;
+            jobArrayList.get(jobArrayList.size() - 1).setDuration((float) Double.parseDouble(jobTokens.get(i)));
+         }  
       }
-      if (jobFinder) {
-        if (jobTokens.get(i).equals(":line:")) {
-          jobFinder = false;
-          i = i - 1;
-        } else {
-          for (JobType job : jobs) {
-            if (job.getName().equals(jobTokens.get(i))) {
-              jobArrayList.get(jobArrayList.size() - 1).setJobType(new JobType(job.getTasks(), job.getName()));
-              i++;
-              break;
-            }
-          }
-          jobArrayList.get(jobArrayList.size() - 1).setStartTime((float) Double.parseDouble(jobTokens.get(i)));
-          i++;
-          jobArrayList.get(jobArrayList.size() - 1).setDuration((float) Double.parseDouble(jobTokens.get(i)));
-        }
-      }
-    }
   }
   private void jobFileErrorCheck() {
     line = 1;
