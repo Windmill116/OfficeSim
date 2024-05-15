@@ -12,7 +12,6 @@ public class Job {
     public Job(String jobId,JobType jobType, float startTime, float duration) {
         this.jobId = jobId;
         this.jobType = jobType;
-        tasks = jobType.getTasks();
         this.startTime = startTime;
         this.duration = duration;
     }
@@ -23,6 +22,7 @@ public class Job {
 
     public void setJobType(JobType jobType) {
         this.jobType = jobType;
+        tasks = jobType.getTasks();
     }
 
     public float getStartTime() {

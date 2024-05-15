@@ -17,10 +17,12 @@ import Frontend.*;
 public class Workflow {
     static boolean testMode = false;
     public static void main(String[] args) {
+        
         FrontendWorkflow testFrontendWorkflow;
         if(!testMode) {
             Organizer organizer;
             try {
+                
                 FileReader jb = new FileReader("job.txt");
                 FileReader fr = new FileReader("test.txt");
                 Parser p = new Parser(fr,jb);// add job file to fix problem
@@ -34,6 +36,7 @@ public class Workflow {
                 e.printStackTrace();
             }
         }else testFrontendWorkflow = new FrontendWorkflow();
+        
 
     }
 
@@ -81,6 +84,14 @@ class FrontendWorkflow{
         stations = organizer.getStations();
 
         tasks = organizer.getTasks();
+        
+        for (JobType jobType : jobTypes) {
+            for (Task task : jobType.getTasks()) {
+                
+                System.out.println(task.getName());
+                
+            }
+        }
 
         System.out.println(tasks.get(0).getName());
         

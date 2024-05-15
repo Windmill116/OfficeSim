@@ -1,4 +1,5 @@
 
+import Parser.Job;
 import Parser.JobType;
 import java.io.FileReader;
 import java.io.IOException;
@@ -11,9 +12,19 @@ import Parser.Task;
 
 public class Test {
     public static void main(String[] args) {
+        FileReader fr = null;
+        FileReader jb = null;
         try {
-            FileReader fr = new FileReader("test.txt");
-            FileReader jb = new FileReader("job.txt");
+             fr = new FileReader("test.txt");
+             jb = new FileReader("job.txt");
+            
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+            System.out.println("test");
+            
             Parser p = new Parser(fr,jb);// add job file to fix problem
             p.start();
             ArrayList<String> tokens = p.getTokens();
@@ -21,9 +32,14 @@ public class Test {
             
             Organizer organizer = new Organizer(tokens, p.getLine(), jobTokens);
             
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        for (Job job : organizer.getJobs()) {
+            
+            for (Task object : job.getTasks()) {
+                
+                System.out.println(object.getValue());
+                
+            }
+            
         }
        
         
