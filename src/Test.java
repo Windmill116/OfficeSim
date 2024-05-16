@@ -32,16 +32,10 @@ public class Test {
             
             Organizer organizer = new Organizer(tokens, p.getLine(), jobTokens);
             
-        for (Job job : organizer.getJobs()) {
+        
             
-            for (Task object : job.getTasks()) {
-                
-                System.out.println(object.getValue());
-                
-            }
             
         }
        
         
     }
-}
