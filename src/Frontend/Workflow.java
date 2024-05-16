@@ -193,7 +193,6 @@ class FrontendWorkflow{
         for(Station s:stations){
             boolean canUseStation=false;
             for(Task sTask : s.getDefaultTasks()){
-                System.out.println(sTask.getName()+ " " + t.getName());
                 if(sTask.getName().equals(t.getName())){
                     canUseStation=true;
                 }
@@ -207,24 +206,6 @@ class FrontendWorkflow{
     }
   
     void WorkflowManager(){
-        /* 
-        System.out.println("In Workflow Manager.");
-        for(tempJob job : jobs){
-            System.out.println("For Job: " + job.getName());
-            for(Task t : job.getTasks()){
-                Station s = getTheFreeStationByTask(t);
-                if(s.getMaxCapacity()>1){
-                    ArrayList<Task> freeStationChannel = s.getFreeChannel();
-                    freeStationChannel.add(getTaskFromStationByName(t, s));
-                    System.out.println(t.getName() + " " + getTaskFromStationByName(t, s).getSpeed() + " " + s.getName() + " Multi Channel Station. Tasks in line: " + freeStationChannel.size() );
-                }else{
-                    s.getTaskChannels().get(0).add(t);
-                    System.out.println("  " + t.getName() + " " + getTaskFromStationByName(t, s).getSpeed() + " "+ s.getName() + " Single Channel Station. Tasks in line: "+s.getTaskChannels().get(0).size());
-                }
-            }
-        }
-        */
-
         extractJobEventsFromJobList();
         HandleEvents();
     }
@@ -237,27 +218,30 @@ class FrontendWorkflow{
         }
     }
 
-    void extractTaskEventsFromJob(Job job){
+    ArrayList<AddTaskEvent> extractTaskEventsFromJob(Job job){
         
-
+        ArrayList<AddTaskEvent> jobsAddTaskEvents = new ArrayList<>();
+        System.out.println("\nFor Job: " + job.getName());
+         
         for(Task t : job.getTasks()){
-            System.out.println("\nFor Job: " + job.getName());
+            
             Station s = getTheFreeStationByTask(t);
             ArrayList<Task> freeStationChannel = s.getFreeChannel();
             Task currentTask = getTaskFromStationByName(t, s);
-            System.out.println("got duration " + currentTask.getDuration());
-            AddTaskEvent event = new AddTaskEvent(job.getStartTime(),currentTask,s,freeStationChannel);
-            EventAdder(event);
-            /* 
-            if(freeStationChannel.size()==0){
-                System.out.println("Remove Task Event new first task: " + currentTask.getName());
-                RemoveTaskEvent removeTaskEvent = new RemoveTaskEvent(currentTask,s,freeStationChannel,0);
-                EventAdder(removeTaskEvent);
-            }
-            */
+            freeStationChannel.add(currentTask);
         }
-
         
+
+        Task taskToUse = job.getTasks().getFirst();
+        Station s = getTheFreeStationByTask(taskToUse);
+        ArrayList<Task> freeStationChannel = s.getFreeChannel();
+        Task currentTask = getTaskFromStationByName(taskToUse, s);
+        System.out.println("got duration " + currentTask.getDuration());
+        AddTaskEvent event = new AddTaskEvent(job.getStartTime(),currentTask,s,freeStationChannel);
+        EventAdder(event);
+        jobsAddTaskEvents.add(event);
+
+        return jobsAddTaskEvents;
     }
 
     void EventAdder(EventTemplate event){
@@ -265,32 +249,6 @@ class FrontendWorkflow{
     }
     
     void HandleEvents(){
-        
-        @SuppressWarnings("unchecked")
-        ArrayList<EventTemplate> waitingEventList = (ArrayList)eventTemplates.clone();//concurrent modification fix.
-        /* 
-        for(EventTemplate event : waitingEventList){
-            switch(event.getClass().getSimpleName()){
-                case "AddTaskEvent":
-                    AddTaskEvent addTaskEvent = (AddTaskEvent)event;
-                    Task task = addTaskEvent.getTask();
-                    addTaskEvent.getTargetChannel().add(task);
-                    break;
-                case "RemoveTaskEvent":
-                    break;
-                case "QueueJobEvent":
-                    QueueJobEvent queueJobEvent = (QueueJobEvent)event;
-                    //First things first the jobs should queue, then the tasks.
-                    extractTaskEventsFromJob(queueJobEvent.getJob());
-                    break;
-                case "FinishJobEvent":
-                    break;
-            }
-            
-
-        }
-        */
-        
         int queueCount = 0;
         EventTemplate currentEvent;
         while(true){
@@ -298,36 +256,29 @@ class FrontendWorkflow{
             currentEvent = eventTemplates.get(queueCount);
             switch(currentEvent.getClass().getSimpleName()){
                 case "AddTaskEvent":
-                    System.out.println("AddTaskEvent " + currentEvent.hashCode());
                     AddTaskEvent addTaskEvent = (AddTaskEvent)currentEvent;
                     Task task = addTaskEvent.getTask();
-                    addTaskEvent.getTargetChannel().add(task);
+                    //addTaskEvent.getTargetChannel().add(task);
                     System.out.println("Task: " + task.getName() + " is added to the queue of " + addTaskEvent.getTargetChannel().size() + " at channel " + addTaskEvent.getTargetStation().getTaskChannels().indexOf(addTaskEvent.getTargetChannel()));
                     addTaskEvent.setDone(true);
 
                     RemoveTaskEvent removeTaskEventOfTask = new RemoveTaskEvent(addTaskEvent.getTime() + task.getDuration(), task,addTaskEvent.getTargetStation(),addTaskEvent.getTargetChannel());
                     EventAdder(removeTaskEventOfTask);
+                    System.out.println(addTaskEvent.getTime() + task.getDuration() +  " bug check");
                     break;
                 case "RemoveTaskEvent":
                     
                     RemoveTaskEvent removeTaskEvent = (RemoveTaskEvent)currentEvent;
-                    System.out.println("Remove task" + removeTaskEvent.getTask().getName());
+                    System.out.println("Remove task " + removeTaskEvent.getTask().getName());
                     removeTaskEvent.setDone(true);
                     Task currentTask = removeTaskEvent.getTask();
                     removeTaskEvent.getTargetChannel().remove(currentTask);
 
                     if(removeTaskEvent.getTargetChannel().size()==0)break;
+                    else{System.out.println(currentTask.getName());}
                     Task nextTask = removeTaskEvent.getTargetChannel().getFirst();
                     AddTaskEvent nextAddTaskEvent = new AddTaskEvent(removeTaskEvent.getTime(), nextTask, removeTaskEvent.getTargetStation());
                     System.out.println("Next event time: " + nextAddTaskEvent.getTime());
-
-                    /*
-                    if(removeTaskEvent.getTargetChannel().size()!=0){
-                        Task nextTask = removeTaskEvent.getTargetChannel().getFirst();
-                        RemoveTaskEvent nextTaskEvent = new RemoveTaskEvent(nextTask, removeTaskEvent.getTargetStation(), removeTaskEvent.getTargetChannel(), removeTaskEvent.getTime());
-                        EventAdder(nextTaskEvent);
-                    }
-                    */
                     break;
                 case "QueueJobEvent":
                     System.out.println("QueueJobEvent");
@@ -338,9 +289,16 @@ class FrontendWorkflow{
                     break;
                 case "FinishJobEvent":
                     break;
+                
+                
             }
 
+            
             Collections.sort(eventTemplates, new EventComparator());
+            for(EventTemplate e : eventTemplates){
+                System.out.println(e.toString());
+            }
+            System.out.println("\n");
             if(queueCount + 1 == eventTemplates.size()) break;
             queueCount++;
         }
@@ -349,7 +307,7 @@ class FrontendWorkflow{
         System.out.println();
         Collections.sort(eventTemplates, new EventComparator());
         for(EventTemplate e : eventTemplates){
-            System.out.println(e.toString()  + " "+ e.hashCode());
+            System.out.println(e.toString());
         }
 
         for(Station s : stations){
