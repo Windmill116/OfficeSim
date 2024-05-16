@@ -3,8 +3,14 @@ import Parser.*;
 import java.util.*;
 
 
-abstract class EventTemplate implements Comparable<EventTemplate>{
+public abstract class EventTemplate implements Comparable<EventTemplate>{
     float time;
+    public float getTime() {
+        return time;
+    }
+    public void setTime(float time) {
+        this.time = time;
+    }
     boolean done = false;
     public boolean isDone() {
         return done;
@@ -22,6 +28,15 @@ class AddTaskEvent extends EventTemplate{
     private Task task;
     private Station targetStation;
     private ArrayList<Task> targetChannel;
+    private Job jobOfTask;
+
+    public Job getJobOfTask() {
+        return jobOfTask;
+    }
+
+    public void setJobOfTask(Job jobOfTask) {
+        this.jobOfTask = jobOfTask;
+    }
 
     public float getTime() {
         return time;
@@ -77,13 +92,22 @@ class AddTaskEvent extends EventTemplate{
     @Override
     public String toString() {
         //return ("Name: " + task.getName() + " Time: " + time + " Station: " + targetStation.getName());
-        return ("Added task is " + task.getName()+ " with a duration of " + task.getDuration()+ " on " + time + " at the station " + targetStation.getName());
+        return ("Added task is " + task.getName() + " for job " + jobOfTask.getJobId() + " with a duration of " + task.getDuration()+ " on " + time + " at the station " + targetStation.getName());
     }
 }
 class RemoveTaskEvent extends EventTemplate{
     private Task task;
     private Station targetStation;
     private ArrayList<Task> targetChannel;
+    private Job jobOfTask;
+
+    public Job getJobOfTask() {
+        return jobOfTask;
+    }
+
+    public void setJobOfTask(Job jobOfTask) {
+        this.jobOfTask = jobOfTask;
+    }
 
     public float getTime() {
         return time;
@@ -150,7 +174,7 @@ class RemoveTaskEvent extends EventTemplate{
     @Override
     public String toString() {
         //return ("Name: " + task.getName() + " Time: " + time + " Station: " + targetStation.getName());
-        return ("Removed task is " + task.getName() + " with a duration of " + task.getDuration() +  " on " + time + " at the station " + targetStation.getName());
+        return ("Removed task is " + task.getName() + " for job " + jobOfTask.getJobId() + " with a duration of " + task.getDuration() +  " on " + time + " at the station " + targetStation.getName());
     }
 }
 

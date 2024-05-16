@@ -2,6 +2,7 @@
 package Parser;
 
 import java.util.*;
+import Frontend.EventTemplate;
 
 public class Station {
     
@@ -15,8 +16,11 @@ public class Station {
 
     ArrayList<ArrayList<Task>> taskChannels = new ArrayList<>(); //channels for the multi task stations. If the station isn't multiflagged, get only thee first channel.
 
+    ArrayList<EventTemplate> events = new ArrayList<>();
+
     
 
+    
     public Station(String name, float maxValue, boolean mutliFlag, boolean fifoflag, float speed, float plusMinus) {
         this.name = name;
         this.maxCapacity = maxValue;
@@ -28,6 +32,13 @@ public class Station {
         for(int i = 0; i < maxCapacity; i++) {
             taskChannels.add(new ArrayList<Task>());
         }
+    }
+
+    public ArrayList<EventTemplate> getEvents() {
+        return events;
+    }
+    public void setEvents(ArrayList<EventTemplate> events) {
+        this.events = events;
     }
     public ArrayList<ArrayList<Task>> getTaskChannels() {
         return taskChannels;
