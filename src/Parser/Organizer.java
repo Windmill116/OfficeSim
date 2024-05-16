@@ -350,31 +350,28 @@ public class Organizer {
             }
             error(error, "Stations");
             if (!error) {
-              for (JobType job : jobs) {
-                boolean defined = false;
-                String text = null;
-                for (Task task : job.getTasks()) {
-                  if (defined)
-                    break;
-                  for (String string : tmpTask) {
-                    if (defined)
-                      break;
-                    if (task.getName().equals(string)) {
-                      text = task.getName();
-                      defined = true;
-                      break;
+                for (JobType job : jobs) {
+                    
+                    for (Task task : job.getTasks()) {
+                        boolean defined = false;
+                        for (String string : tmpTask) {
+                            if (defined)
+                            break;
+                            if(string.equals(task.getName()))
+                            {
+                                defined = true;
+                                break;
+                            }
+                            if(defined) break;
+                        }
+                        if (!defined)
+                        {
+                             error = true;
+                             System.out.println("**WORKFLOW FILE** "+ "you defined " + task.getName() + " and used in jobs but you did not use");
+                        }
+                        
                     }
-                    if (defined)
-                      break;
-                  }
-                  if (defined)
-                    break;
                 }
-                if (!defined) {
-                  error = true;
-                  System.out.println("**WORKFLOW FILE** "+ "you defined " + text + " and used in jobs but you did not use");
-                }
-              }
               for (Task task : tasks) {
                 boolean defined = false;
                 for (String string : tmpTask) {
