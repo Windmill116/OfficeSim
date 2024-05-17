@@ -389,9 +389,10 @@ class FrontendWorkflow{
             System.out.print("\n\nAt station " + s.getName() + " Channel queues ");
             for(ArrayList<Task> i : s.getTaskChannels()){
                 System.out.print(i.size() + " ");
-                if(i.size()!=0)System.out.println(i.get(0).getName());
+                if(i.size()!=0)System.out.print(i.get(0).getName() + " ");
             }
-            System.out.println("Utilization for " + s.getName() + " is " +s.getDurationAddUpForUtilization());
+            float lastEventTime = eventTemplates.getLast().getTime();
+            System.out.println("Utilization for " + s.getName() + " is %" +(s.getDurationAddUpForUtilization()/lastEventTime)*100);
             System.out.println();
         }
     }
