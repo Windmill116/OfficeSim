@@ -216,7 +216,7 @@ class FrontendWorkflow{
                 usableStations.add(s);
             }
         }
-        return usableStations.get(0); //might add strategic selection later. That's why there is more than one usables added.
+        return usableStations.get(0);
     }
     Station getTheFreeStationByTask(Task t){
         ArrayList<Station> usableStations = new ArrayList<>();
@@ -232,7 +232,17 @@ class FrontendWorkflow{
                 usableStations.add(s);
             }
         }
-        return usableStations.get(0); //might add strategic selection later. That's why there is more than one usables added.
+        if(usableStations.size()==0) return null;
+
+        int leastCount = 1000;
+        Station leastBusyStation = new Station(null, leastCount, false, false, leastCount, leastCount);
+        for(Station s: usableStations){
+            if(leastCount>s.getFreeChannel().size()) {
+                leastCount = s.getFreeChannel().size();
+                leastBusyStation = s;
+            }
+        }
+        return leastBusyStation;
     }
   
     void WorkflowManager(){
@@ -256,6 +266,7 @@ class FrontendWorkflow{
         for(Task t : job.getTasks()){
             
             Station s = getTheFreeStationByTask(t);
+            if(s==null)continue;
             ArrayList<Task> freeStationChannel = s.getFreeChannel();
             Task currentTask = getTaskFromStationByName(t, s);
 
@@ -273,6 +284,7 @@ class FrontendWorkflow{
             removeTaskEvent.setJobOfTask(job);
             s.getEvents().add(addTaskEvent);
             s.getEvents().add(removeTaskEvent);
+            s.setDurationAddUpForUtilization(s.getDurationAddUpForUtilization() + currentTask.getDuration());
 
             EventAdder(addTaskEvent);
             EventAdder(removeTaskEvent);
@@ -377,7 +389,9 @@ class FrontendWorkflow{
             System.out.print("\n\nAt station " + s.getName() + " Channel queues ");
             for(ArrayList<Task> i : s.getTaskChannels()){
                 System.out.print(i.size() + " ");
+                if(i.size()!=0)System.out.println(i.get(0).getName());
             }
+            System.out.println("Utilization for " + s.getName() + " is " +s.getDurationAddUpForUtilization());
             System.out.println();
         }
     }

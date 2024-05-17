@@ -12,6 +12,10 @@ public class Station {
     boolean fifoflag;
     float speed;
     float plusMinus;
+
+    float durationAddUpForUtilization = 0;
+    
+
     ArrayList<Task> defaultTasks = new ArrayList<>(); 
 
     ArrayList<ArrayList<Task>> taskChannels = new ArrayList<>(); //channels for the multi task stations. If the station isn't multiflagged, get only thee first channel.
@@ -32,6 +36,14 @@ public class Station {
         for(int i = 0; i < maxCapacity; i++) {
             taskChannels.add(new ArrayList<Task>());
         }
+    }
+
+    public float getDurationAddUpForUtilization() {
+        return durationAddUpForUtilization;
+    }
+
+    public void setDurationAddUpForUtilization(float durationAddUpForUtilization) {
+        this.durationAddUpForUtilization = durationAddUpForUtilization;
     }
 
     public ArrayList<EventTemplate> getEvents() {
