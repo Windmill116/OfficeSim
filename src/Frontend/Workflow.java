@@ -43,13 +43,15 @@ public class Workflow {
     public static void startMenu(){
         Scanner s1=new Scanner(System.in);
 
-        System.out.println("Enter 'test' to start the program in test mode,\nenter anything else to start the program in the normal mode.");
+        System.out.println("Enter 'test' to start the program in test mode,\nEnter 'cancel' to end the program,\nEnter anything else to start the program in the normal mode.");
         String s=s1.nextLine();
         s1.close();
-        
+
         if(s.toLowerCase().equals("test")){
             FrontendWorkflow testFrontendWorkflow;
             testFrontendWorkflow = new FrontendWorkflow();
+        } else if(s.toLowerCase().equals("cancel")){
+            return;
         } else{
             FrontendWorkflow testFrontendWorkflow;
             Organizer organizer;
