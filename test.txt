@@ -5,7 +5,7 @@
 (J3 T2) 
 (J5 T21 5 T1 2) )
 (STATIONS 
-(S1 1 N N T1 2 T2 3 0.20 t60 1)
+(S1 1 N N T1 2 T2 3 0.20 t60 5)
 (S2 2 N Y T1 2 T2 4)
 (S3 2 N Y T3 1 T4 2)
 (S4 3 Y Y T5 1 T21 2 0.50 ) ) 
