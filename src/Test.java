@@ -14,16 +14,18 @@ public class Test {
     public static void main(String[] args) {
         FileReader fr = null;
         FileReader jb = null;
+        if(args.length < 2){
+            System.out.println("USAGE: officesim.jar <workflow file> <job file>");
+            return;
+        }
         try {
-             fr = new FileReader("test.txt");
-             jb = new FileReader("job.txt");
+             fr = new FileReader(args[0]);
+             jb = new FileReader(args[1]);
             
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
-            System.out.println("test");
             
             Parser p = new Parser(fr,jb);// add job file to fix problem
             p.start();

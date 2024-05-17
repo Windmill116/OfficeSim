@@ -11,6 +11,8 @@ public class Parser{
     private ArrayList<String> tokens;
     private LineNumberReader jobFileReader;
     private ArrayList<String> jobTokens;
+    private int lineNumber;
+
     /* Gets argument as FileReader and */
     public Parser(FileReader r,FileReader jobFileReader){
         Locale.setDefault(Locale.ENGLISH);
@@ -19,6 +21,7 @@ public class Parser{
         this.currentDepth =0;
         this.tokens = new ArrayList<String>();
         this.jobTokens = new ArrayList<String>();
+        this.lineNumber =0;
     }
     
     private String readLine(LineNumberReader reader){
@@ -43,15 +46,15 @@ public class Parser{
     
     private int workflowTokenizer(){
         String line = readLine(this.reader);
-        line = line.replaceAll("\\p{C}", "");       //Delete non-printable characters (Organizer just works with full lines)
         while(line != null){
+            line = line.replaceAll("\\p{C}", "");       //Delete non-printable characters (Organizer just works with full lines)
+
             if(line.length() <= 0){                                 //If line is empty, switch to next line
                 line = readLine(this.reader);
                 continue;
             }
-
             tokens.add(":line:");
-
+            lineNumber++;
             //Split line into pre-tokens
             String[] temp = line.split(" ");
 
@@ -62,7 +65,7 @@ public class Parser{
                 /*Build a token char by char*/
                 for(char s2: s.toCharArray()){
 
-                    if(Character.isISOControl(s2) || s2 == '\n' )
+                    if(Character.isISOControl(s2) || s2 == '\n' || Character.isWhitespace(s2) || Character.isISOControl(s2))
                         continue;
 
                     /*If char is (  or ) add another token */
@@ -94,20 +97,19 @@ public class Parser{
         
         
         this.tokens.removeIf(String::isBlank);
-        tokens.add(":line:");
+        tokens.add(":line:");           //TODO: Strange behaivour
         return tokens;
     }
 
     public int getLine() {
-        return reader.getLineNumber();
+        return lineNumber;
     }
     
     private int jobFileReader()
     {
         String line = readLine(jobFileReader);
-        line = line.replaceAll("\\p{C}", "");       //Delete all non-printable characters (Otherwise they may assumed as a new line)
-        
         while(line != null){
+            line = line.replaceAll("\\p{C}", "");       //Delete all non-printable characters (Otherwise they may assumed as a new line)
             if(line.length() <= 0){                                 //If line is empty, switch to next line
                 line = readLine(this.jobFileReader);
                 continue;
