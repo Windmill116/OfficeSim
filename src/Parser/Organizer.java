@@ -436,8 +436,8 @@ public class Organizer {
         }
         try {
           float val = (float) Double.parseDouble(tokens.get(i));
-          if (val < 0) {
-            System.out.println("**WORKFLOW FILE** "+ "line: " + line + " " + tokens.get(i - 1) + " The value of this task is negative. Please enter a positive task value.");
+          if (val <= 0) {
+            System.out.println("**WORKFLOW FILE** "+ "line: " + line + " "  + " The value of this task is invalid. Please enter a positive or bigger than 0 task value.");
             error = true;
           }
         } catch (NumberFormatException e) {
@@ -454,6 +454,13 @@ public class Organizer {
             System.out.println("**WORKFLOW FILE** "+ "line: " + line + " task: " + tokens.get(i) + " is not defined in tasktypes. ");
             error = true;
           }
+            try {
+                float val = (float) Double.parseDouble(tokens.get(i+1));
+            } catch (Exception a) {
+                
+                System.out.println("**WORKFLOW FILE** "+ "line: " + line + " " +tokens.get(i) + " The speed of this task is not defined. Please enter a positive or bigger than 0 task value.");
+                error = true;
+            }
         }
       }
     }
