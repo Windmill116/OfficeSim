@@ -33,7 +33,7 @@ public class Test {
             Organizer organizer = new Organizer(tokens, p.getLine(), jobTokens);
             
             
-           
+           System.out.println("test finished");
             
         }
        

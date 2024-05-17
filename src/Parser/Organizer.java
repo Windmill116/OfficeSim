@@ -460,7 +460,11 @@ public class Organizer {
   }
   private void error(boolean error, String text) {
     if (error)
-      System.err.println("Before starting the program please fix " + text + " errors."+ "\nDo not forget these errors are only " + text + " errors, there may be more errors in other variables.");
+    {
+        System.err.println("Before starting the program please fix " + text + " errors."+ "\nDo not forget these errors are only " + text + " errors, there may be more errors in other variables.");
+         System.exit(0);
+    }
+      
   }//*** End of the workflow file methods**//
   private void jobOrganizer() {
       for (int i = 0; i < jobTokens.size(); i++) {
