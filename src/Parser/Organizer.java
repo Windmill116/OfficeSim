@@ -30,9 +30,9 @@ public class Organizer {
     } else // if its not ok print whats wrong
     {
       if (!jobtypesB) { // jobtypes is not exist
-        System.err.println("**WORKFLOW FILE** "+ "jobtypes is not exist and it will cause a lots of problem before start the program fix it");
+        System.err.println("**WORKFLOW FILE** "+ "JOBTYPES does not exist. Before starting the program fix it.");
       } else {// stations is not exist
-        System.err.println("**WORKFLOW FILE** " + "stations is not exist and it will cause a lots of problem before start the program fix it");
+        System.err.println("**WORKFLOW FILE** " + "STATIONS does not exist. Before starting the program fix it.");
       }
     }
   }
@@ -132,13 +132,13 @@ public class Organizer {
     ArrayList<String> tasks2 = new ArrayList<>(); // to check same tasks
     if (!tokens.get(1).equals("(")) // check for (
     {
-      System.out.println("**WORKFLOW FILE** "+ "line: " + line + "( is missing");
+      System.out.println("**WORKFLOW FILE** "+ "line: " + line + "( is missing.");
       error = true;
     }
     if (!tokens.get(2).equals("tasktypes")) // check for tasktypes is wrong or not
     {
       error = true;
-      System.out.println("**WORKFLOW FILE** "+ "line: " + line + " you wrote tasktypes wrong");
+      System.out.println("**WORKFLOW FILE** "+ "line: " + line + " You wrote TASKTYPES wrong.");
     }
     for (int i = 3; i < tokens.size(); i++) {
       if (tokens.get(i).equals(":line:")) // ignore :line: tokens
@@ -149,11 +149,11 @@ public class Organizer {
       if (tokens.get(i).equals("jobtypes")) // to end the code
       {
         if (!tokens.get(i - 1).equals("(")) {
-          System.out.println("**WORKFLOW FILE** "+ "line: " + line + " ( is missing");
+          System.out.println("**WORKFLOW FILE** "+ "line: " + line + " ( is missing.");
           error = true;
         }
         if (!tokens.get(i - 3).equals(")") && !tokens.get(i - 2).equals(")")) {
-          System.out.println("**WORKFLOW FILE** " + "line: " + (line - 1) + ") is missing");
+          System.out.println("**WORKFLOW FILE** " + "line: " + (line - 1) + ") is missing.");
           error = true;
         }
         index2 = i + 1; // to skip useless tokens
@@ -162,14 +162,14 @@ public class Organizer {
       try {
         float val = (float) Double.parseDouble(tokens.get(i)); // check is it digit
         if (val < 0) {
-          System.out.println("**WORKFLOW FILE** "+ "line: " + line + " " + tokens.get(i) + " value of task is smaller than 0 ");
+          System.out.println("**WORKFLOW FILE** "+ "line: " + line + " " + tokens.get(i) + " The value of this task is negative. Please enter a positive task value.");
           error = true;
         }
       } catch (NumberFormatException e) {
         if (tasks2.contains(tokens.get(i))) // if it is not digit start this code
         {
           error = true;
-          System.out.println("**WORKFLOW FILE** "+ "line: " + line + " " + tokens.get(i) + " is already defined");
+          System.out.println("**WORKFLOW FILE** "+ "line: " + line + " " + tokens.get(i) + " is already defined.");
         } else {
           if (tokens.get(i).equals("(") || tokens.get(i).equals(")"))
             continue;
@@ -177,7 +177,7 @@ public class Organizer {
             tasks2.add(tokens.get(i));
           } else {
             error = true;
-            System.out.println("**WORKFLOW FILE** "+ "Line " + line + " this task type is invalid \"" + tokens.get(i) + "\" pls change the name");
+            System.out.println("**WORKFLOW FILE** "+ "Line " + line + " Invalid task type: \"" + tokens.get(i) + "\" Please change the name.");
           }
         }
       }
@@ -196,12 +196,12 @@ public class Organizer {
           line++;
           newLine = true;
           if (!tokens.get(i).equals("(")) {
-            System.out.println("**WORKFLOW FILE** "+ "line: " + line + "( is missing");
+            System.out.println("**WORKFLOW FILE** "+ "line: " + line + "( is missing.");
             error = true;
           }
           i++;
           if (jobs2.contains(tokens.get(i))) {
-            System.out.println("**WORKFLOW FILE** "+ "line : " + line + " job type :" + tokens.get(i) + " is already defined");
+            System.out.println("**WORKFLOW FILE** "+ "line: " + line + "   Job type: " + tokens.get(i) + " is already defined.");
             error = true;
           } else {
             jobs2.add(tokens.get(i));
@@ -217,11 +217,11 @@ public class Organizer {
           if (tokens.get(i + 1).equals("stations") || tokens.get(i + 2).equals("stations")) {
             // to do end the checker
             if (!tokens.get(i - 1).equals(")")) {
-              System.out.println("**WORKFLOW FILE** "+ "line: " + line + ") is missing");
+              System.out.println("**WORKFLOW FILE** "+ "line: " + line + ") is missing.");
               error = true;
             }
             if (!tokens.get(i - 2).equals(")")) {
-              System.out.println("**WORKFLOW FILE** "+ "line: " + line + ") is missing");
+              System.out.println("**WORKFLOW FILE** "+ "line: " + line + ") is missing.");
               error = true;
             }
             error(error, "jobs");
@@ -233,7 +233,7 @@ public class Organizer {
           }
           newLine = false;
           if (!tokens.get(i - 1).equals(")")) {
-            System.out.println("**WORKFLOW FILE** "+ "line: " + line + ") is missing");
+            System.out.println("**WORKFLOW FILE** "+ "line: " + line + ") is missing.");
             error = true;
           }
           i = i - 1;
@@ -242,7 +242,7 @@ public class Organizer {
         try {
           float val = (float) Double.parseDouble(tokens.get(i));
           if (val < 0) {
-            System.out.println("**WORKFLOW FILE** "+ "line: " + line + " " + tokens.get(i) + " value of task is smaller than 0 ");
+            System.out.println("**WORKFLOW FILE** "+ "line: " + line + " " + tokens.get(i) + " The value of this task is negative. Please enter a positive task value. ");
             error = true;
           }
         } catch (NumberFormatException e) {
@@ -254,7 +254,7 @@ public class Organizer {
 
               } catch (Exception x) {
                 if (taskName.getValue() == -1) {
-                  System.out.println("**WORKFLOW FILE** "+ "line : " + line + " task : " + tokens.get(i) + "value is not defined at tasktypes or jobtypes");
+                  System.out.println("**WORKFLOW FILE** "+ "line: " + line + " task: " + tokens.get(i) + " The value of this task has not been defined in TASKTYPES, or JOBTYPES.");
                   error = true;
                 }
               }
@@ -304,7 +304,7 @@ public class Organizer {
           try {
             float val = (float) Double.parseDouble(tokens.get(i));
             if (val < 0) {
-              System.out.println("**WORKFLOW FILE** "+ "line : " + line + tokens.get(i) + " is negative. Please enter numbers which bigger than zero");
+              System.out.println("**WORKFLOW FILE** "+ "line : " + line + tokens.get(i) + " The value of this station speed is negative. Please enter a positive speed value.");
               error = true;
             }
           } catch (Exception e) {
@@ -314,22 +314,22 @@ public class Organizer {
           i++;
           try {
             float val = (float) Double.parseDouble(tokens.get(i));
-            System.out.println("**WORKFLOW FILE** "+ "line : " + line + " " + tokens.get(i) + " is not Y(yes) or N(no). Please enter a valid character");
+            System.out.println("**WORKFLOW FILE** "+ "line : " + line + " " + tokens.get(i) + " is not Y(yes) or N(no). Please enter a valid character.");
             error = true;
           } catch (Exception e) {
             if (!tokens.get(i).equals("y") && !tokens.get(i).equals("n")) {
-              System.out.println("**WORKFLOW FILE** "+ "line : " + line + " " + tokens.get(i) + " is not Y(yes) or N(no). Please enter a valid character");
+              System.out.println("**WORKFLOW FILE** "+ "line : " + line + " " + tokens.get(i) + " is not Y(yes) or N(no). Please enter a valid character.");
               error = true;
             }
           }
           i++;
           try {
             float val = (float) Double.parseDouble(tokens.get(i));
-            System.out.println("**WORKFLOW FILE** "+ "line : " + line + " " + tokens.get(i) + " is not Y(yes) or N(no). Please enter valid character");
+            System.out.println("**WORKFLOW FILE** "+ "line : " + line + " " + tokens.get(i) + " is not Y(yes) or N(no). Please enter valid character.");
             error = true;
           } catch (Exception e) {
             if (!tokens.get(i).equals("y") && !tokens.get(i).equals("n")) {
-              System.out.println("**WORKFLOW FILE** "+ "line : " + line + " " + tokens.get(i) + " is not Y(yes) or N(no). Please enter valid character");
+              System.out.println("**WORKFLOW FILE** "+ "line : " + line + " " + tokens.get(i) + " is not Y(yes) or N(no). Please enter valid character.");
               error = true;
             }
           }
@@ -341,11 +341,11 @@ public class Organizer {
           line++;
           if (line == maxLine) {
             if (!tokens.get(i - 1).equals(")")) {
-              System.out.println("**WORKFLOW FILE** "+ "line: " + line + " ) is missing");
+              System.out.println("**WORKFLOW FILE** "+ "line: " + line + " ) is missing.");
               error = true;
             }
             if (!tokens.get(i - 2).equals(")")) {
-              System.out.println("**WORKFLOW FILE** "+ "line: " + line + " ) is missing");
+              System.out.println("**WORKFLOW FILE** "+ "line: " + line + " ) is missing.");
               error = true;
             }
             error(error, "Station");
@@ -385,7 +385,7 @@ public class Organizer {
                     break;
                 }
                 if (!defined)
-                  System.out.println("**WORKFLOW FILE** " + task.getName() + " is defined, but you did not use it. Be careful");
+                  System.out.println("**WORKFLOW FILE** " + task.getName() + " is defined, but you did not use it. Be careful.");
               }
                 for (String token : tokens) {
                    if(token.equals("(")||token.equals(")"))  parantheses++;
@@ -393,7 +393,7 @@ public class Organizer {
                 if((parantheses%2)>0)
                 {
                     error = true;
-                    System.out.println("**WORKFLOW FILE** " + " You used too many brackets, this may cause an error. Please fix it before starting the program");
+                    System.out.println("**WORKFLOW FILE** " + " You used too many brackets, this may cause an error. Please fix it before starting the program.");
                 }
               organizeStations();
             }
@@ -401,7 +401,7 @@ public class Organizer {
           }
           newLine = false;
           if (!tokens.get(i - 1).equals(")")) {
-            System.out.println("**WORKFLOW FILE** "+ "line: " + line + " ) is missing");
+            System.out.println("**WORKFLOW FILE** "+ "line: " + line + " ) is missing.");
             error = true;
           }
           i = i - 1;
@@ -468,7 +468,7 @@ public class Organizer {
           jobStrings.add(jobTokens.get(i));
         } else {
           error = true;
-          System.out.println("**JOB FILE** "+ "Line " + line + ": you already defined " + jobTokens.get(i));
+          System.out.println("**JOB FILE** "+ "Line " + line + ": You already defined " + jobTokens.get(i));
         }
         i++;
         Boolean check = false;
@@ -480,18 +480,18 @@ public class Organizer {
         }
         if (!check) {
           error = true;
-          System.out.println("**JOB FILE** "+ "Line " + line + ": you did not define " + jobTokens.get(i) + " in jobtypes");
+          System.out.println("**JOB FILE** "+ "Line " + line + ": You did not define " + jobTokens.get(i) + " in jobtypes.");
         }
       } else {
         try {
           float val = (float) Double.parseDouble(jobTokens.get(i));
           if (val < 0) {
-            System.out.println("**JOB FILE** "+ "Line " + line + ": " + jobTokens.get(i) + " is negative");
+            System.out.println("**JOB FILE** "+ "Line " + line + ": " + jobTokens.get(i) + " is negative.");
             error = true;
           }
         } catch (Exception e) {
           error = true;
-          System.out.println("**JOB FILE** "+ "Line " + line + ": " + jobTokens.get(i) + " is not number");
+          System.out.println("**JOB FILE** "+ "Line " + line + ": " + jobTokens.get(i) + " is not a number.");
         }
       }
     }
