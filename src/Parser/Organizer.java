@@ -56,7 +56,17 @@ public class Organizer {
   }
   private void organizeJobTypes() // after jobs error check this code create job objects and send  values to the objects
   {
-    for (int i = index; i < tokens.size(); i++) { // for loop for move in to tokens
+      
+    for (int i = index; i < tokens.size(); i++) {
+        // for loop for move in to tokens
+        if(tokens.get(i).equals("("))
+        {
+            if(!tokens.get(i-1).equals(":line:"))
+            {
+                tokens.add(i, ":line:");
+                index2++;
+            }
+        }
       if (tokens.get(i).equals("(") || tokens.get(i).equals(")")) // ignore ( and ) tokens
         continue;
       if (tokens.get(i).equals(":line:")) { // to spot line
@@ -75,14 +85,17 @@ public class Organizer {
               jobs.getLast().getTasks().add(new Task(task.getName(), task.getValue()));  // when method find the same task object ,
           } // create new task object in last job type object
         } else {
+          
           jobs.getLast().getTasks().getLast().setValue((float) Double.parseDouble(tokens.get(i))); // convert token strint to the float to send val
         }
       }
+        
     }
   }
   private void organizeStations() // after stations error check , this code create station objects and send values to the that objects
   {
-    for (int i = index; i < tokens.size(); i++) { // for loop to move in tokens array list
+    for (int i = index; i < tokens.size(); i++) {
+       
       if (tokens.get(i).equals("(") || tokens.get(i).equals(")")) // ignore ( and ) tokens
         continue;
       if (tokens.get(i).equals(":line:")) { // if token is line
@@ -93,9 +106,9 @@ public class Organizer {
           float maxCapacity = (float) Double.parseDouble(tokens.get(i + 1)); // check max capacity
           boolean mutliFlag = false;
           boolean fifoflag = false;
-          if (tokens.get(i + 2).equals("Y"))
+          if (tokens.get(i + 2).equals("y"))
             mutliFlag = true; // check multiflag
-          if (tokens.get(i + 3).equals("Y"))
+          if (tokens.get(i + 3).equals("y"))
             fifoflag = true; // check fifoflag
           stations.add(new Station(name, maxCapacity, mutliFlag, fifoflag, 0, 0));
           i = i + 3;
@@ -272,8 +285,8 @@ public class Organizer {
   }
   private void StationErrorDetector() {
     // start with line 7
-    ArrayList<String> stations2 = new ArrayList<String>();
-    ArrayList<String> tmpTask = new ArrayList<String>();
+    ArrayList<String> stations2 = new ArrayList<>();
+    ArrayList<String> tmpTask = new ArrayList<>();
     newLine = false;
     index2 = index2 + 1;
     line++;
@@ -350,6 +363,17 @@ public class Organizer {
             }
             error(error, "Station");
             if (!error) {
+                
+                for (int j = index; j < tokens.size(); j++) {
+                    if(tokens.get(j).equals("("))
+                    {
+                       if(!tokens.get(j-1).equals(":line:"))
+                       {
+                           tokens.add(j,":line:");
+                           index2++;
+                       }
+                    }
+                }
                 for (JobType job : jobs) {
                     
                     for (Task task : job.getTasks()) {
@@ -385,7 +409,10 @@ public class Organizer {
                     break;
                 }
                 if (!defined)
+                {
+                  error = true;
                   System.out.println("**WORKFLOW FILE** " + task.getName() + " is defined, but you did not use it. Be careful.");
+                }
               }
                 for (String token : tokens) {
                    if(token.equals("(")||token.equals(")"))  parantheses++;
