@@ -40,7 +40,35 @@ public class Workflow {
 
     }
 
-    
+    public static void startMenu(){
+        Scanner s1=new Scanner(System.in);
+
+        System.out.println("Enter 'test' to start the program in test mode,\nenter anything else to start the program in the normal mode.");
+        String s=s1.nextLine();
+        s1.close();
+        
+        if(s.toLowerCase().equals("test")){
+            FrontendWorkflow testFrontendWorkflow;
+            testFrontendWorkflow = new FrontendWorkflow();
+        } else{
+            FrontendWorkflow testFrontendWorkflow;
+            Organizer organizer;
+            try {
+                
+                FileReader jb = new FileReader("job.txt");
+                FileReader fr = new FileReader("test.txt");
+                Parser p = new Parser(fr,jb);// add job file to fix problem
+                p.start();
+                ArrayList<String> tokens = p.getTokens();
+                organizer = new Organizer(tokens,p.getLine(),p.getJobTokens());
+
+                testFrontendWorkflow = new FrontendWorkflow(organizer);
+                
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     
 
