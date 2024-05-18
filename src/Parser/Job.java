@@ -68,6 +68,10 @@ public class Job {
         return tasks;
     }
 
+
+    public String toString(){
+        return this.jobType.toString()+"\nJobID: "+this.jobId+"\nStart time: "+this.startTime+"\nDuration: "+this.duration;
+    }
     public ArrayList<EventTemplate> getEventTemplates() {
         return eventTemplates;
     }

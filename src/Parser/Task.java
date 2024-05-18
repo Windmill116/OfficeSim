@@ -72,4 +72,8 @@ public class Task {
     public float getDuration() {
         return duration;
     }
+
+    public String toString(){
+        return this.name.toUpperCase();
+    }
 }

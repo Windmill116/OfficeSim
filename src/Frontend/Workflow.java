@@ -117,6 +117,8 @@ class FrontendWorkflow{
         stations = organizer.getStations();
 
         tasks = organizer.getTasks();
+
+        
         
         for (JobType jobType : jobTypes) {
             for (Task task : jobType.getTasks()) {
@@ -128,6 +130,32 @@ class FrontendWorkflow{
         
         WorkflowManager();
     }
+
+    private void printWorkflowInfo(){
+        System.out.println("---WORKFLOW INFO---");
+        System.out.println();
+        System.out.println("Tasks:");
+        System.out.println();
+        for (Task task : tasks) {
+            System.out.println(task.toString());
+            System.out.println();
+        }
+        System.out.println();
+        System.out.println("Stations:");
+        System.out.println();
+        for (Station station : stations) {
+            System.out.println(station.toString());
+            System.out.println();
+        }
+        System.out.println();
+        System.out.println("Job types:");
+        System.out.println();
+        for (Job job : jobs) {
+            System.out.println(job.toString());
+            System.out.println();
+        }
+    }
+
     public void createTestObjects(){
         /*Job1 J1 1 30
         Job2 J1 2 29
@@ -248,6 +276,7 @@ class FrontendWorkflow{
     }
   
     void WorkflowManager(){
+        printWorkflowInfo();
         extractJobEventsFromJobList();
         HandleEvents();
     }

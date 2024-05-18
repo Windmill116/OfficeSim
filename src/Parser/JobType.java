@@ -34,7 +34,13 @@ public class JobType {
         this.name = name;
     }
     
-    
+    public String toString(){
+        String s="";
+        for (Task task : this.tasks) {
+            s+=task.getName().toUpperCase()+" ";
+        }
+        return this.name.toUpperCase()+":\nTasks of the job: "+s;
+    }
     
     
     
