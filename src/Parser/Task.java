@@ -74,6 +74,6 @@ public class Task {
     }
 
     public String toString(){
-        return this.name.toUpperCase()+":\nValue: "+this.value;
+        return this.name.toUpperCase();
     }
 }
