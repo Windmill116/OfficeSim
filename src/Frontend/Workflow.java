@@ -285,11 +285,13 @@ class FrontendWorkflow{
             s.getEvents().add(addTaskEvent);
             s.getEvents().add(removeTaskEvent);
             s.setDurationAddUpForUtilization(s.getDurationAddUpForUtilization() + currentTask.getDuration());
+            job.getEventTemplates().add(removeTaskEvent);
 
             EventAdder(addTaskEvent);
             EventAdder(removeTaskEvent);
         }
-        
+        job.calculateJobTardiness();
+
         /* 
         Task taskToUse = job.getTasks().getFirst();
         Station s = getTheFreeStationByTask(taskToUse);
@@ -384,16 +386,19 @@ class FrontendWorkflow{
         for(EventTemplate e : eventTemplates){
             System.out.println(e.toString());
         }
-
+        System.out.println();
         for(Station s : stations){
-            System.out.print("\n\nAt station " + s.getName() + " Channel queues ");
+            System.out.print("At station " + s.getName() + " Channel queues ");
             for(ArrayList<Task> i : s.getTaskChannels()){
                 System.out.print(i.size() + " ");
                 if(i.size()!=0)System.out.print(i.get(0).getName() + " ");
             }
             float lastEventTime = eventTemplates.getLast().getTime();
             System.out.println("Utilization for " + s.getName() + " is %" +(s.getDurationAddUpForUtilization()/lastEventTime)*100);
-            System.out.println();
+        }
+        System.out.println();
+        for(Job job : jobs){
+            System.out.println(job.getName() + " tardiness: " + job.getJobTardiness());
         }
     }
 
