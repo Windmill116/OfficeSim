@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 
 import Parser.*;
-import Frontend.*;
 
 /*NOTES
  * 1- I will assume that the Jobs go one by one and tasks arent mixed but rather done Job by Job.
@@ -262,14 +261,14 @@ class FrontendWorkflow{
     }
 
     void extractJobEventsFromJobList(){
-        Collections.sort(jobs, new JobComparator());        //Sort jobs according to their 
+        Collections.sort(jobs, new JobComparator());        //Sort jobs according to their start date
         for(Job job : jobs){
             QueueJobEvent event = new QueueJobEvent(job,job.getStartTime());
             EventAdder(event);
         }
     }
 
-    ArrayList<AddTaskEvent> extractTaskEventsFromJob(Job job){
+    ArrayList<AddTaskEvent> extractTaskEventsFromJob(Job job){      //Extract tasks from jobs and put it in line in relevant stations, handleEvents calls it
         
         ArrayList<AddTaskEvent> jobsAddTaskEvents = new ArrayList<>();
         System.out.println("\nFor Job: " + job.getName());
@@ -352,39 +351,6 @@ class FrontendWorkflow{
             System.out.println("\n");
             if(queueCount + 1 == eventTemplates.size()) break;
             queueCount++;
-        }
-
-
-        if(false)
-        for(Station s : stations){
-            if(!s.isFifoflag()) continue;
-            @SuppressWarnings("unchecked")
-            ArrayList<EventTemplate> reversedEventList = (ArrayList<EventTemplate>) s.getEvents().clone();
-            if(reversedEventList.size() == 0) continue;
-            EventTemplate firstEvent = reversedEventList.getFirst();
-            ArrayList<EventTemplate> newEventList = new ArrayList<EventTemplate>();
-            /* 
-            for(EventTemplate et : reversedEventList){
-                if(et.getClass().getSimpleName()=="RemoveTaskEvent") reversedEventList.remove(et);
-            }
-            */
-            for(int i = 0; i < reversedEventList.size(); i+=2){
-                int ri = reversedEventList.size()-i-1;
-    
-                if(i==0){ 
-                    reversedEventList.get(ri-1).setTime(firstEvent.getTime());
-                    reversedEventList.get(ri).setTime(firstEvent.getTime() + ((AddTaskEvent)reversedEventList.get(ri-1)).getTask().getDuration());
-                    continue;
-                }
-    
-                float ATETime = reversedEventList.get(ri+2).getTime(); 
-                AddTaskEvent ATEEvent = (AddTaskEvent)reversedEventList.get(ri-1);
-                float RTETime = ATETime + ATEEvent.getTask().getDuration();
-                RemoveTaskEvent RTEEvent = (RemoveTaskEvent)reversedEventList.get(ri);
-                ATEEvent.setTime(ATETime);
-                RTEEvent.setTime(RTETime);
-            }
-            Collections.sort(reversedEventList,new EventComparator());
         }
 
         System.out.println();
@@ -491,7 +457,7 @@ class tempJob{
 
 }
 
-class TaskComparator implements Comparator<Task> {
+class TaskComparator implements Comparator<Task> {          //Compare according to their
     public int compare(Task task1, Task task2) {
         if(task1.getValue()==task2.getValue()){
             return 0;
