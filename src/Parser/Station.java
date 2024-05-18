@@ -145,6 +145,22 @@ public class Station {
         }
         return currentDuration;
     }
+
+    public String toString(){
+        String fifo;
+        String multi;
+        if(this.isFifoflag()){
+            fifo="Y";
+        } else{
+            fifo="N";
+        }
+        if(this.isMutliFlag()){
+            multi="Y";
+        } else{
+            multi="N";
+        }
+        return this.name.toUpperCase()+":\nFIFOFLAG: "+fifo+"\nMULTIFLAG: "+multi+"\nMax capacity: "+this.maxCapacity;
+    }
 }
 
 class ChannelComparator implements Comparator<ArrayList<Task>>{
@@ -158,5 +174,6 @@ class ChannelComparator implements Comparator<ArrayList<Task>>{
             return -1;
         }
     }
+
 }
 

@@ -56,4 +56,8 @@ public class Job {
     public ArrayList<Task> getTasks(){
         return tasks;
     }
+
+    public String toString(){
+        return this.jobType.toString()+"\nJobID: "+this.jobId+"\nStart time: "+this.startTime+"\nDuration: "+this.duration;
+    }
 }
