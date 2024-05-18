@@ -8,3 +8,4 @@ src/test.txt
 src/Parser/test
 src/debug2.txt
 src/debug.txt
+*.docx
