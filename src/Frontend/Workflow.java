@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 
 import Parser.*;
-import Frontend.*;
 
 /*NOTES
  * 1- I will assume that the Jobs go one by one and tasks arent mixed but rather done Job by Job.
@@ -23,30 +22,10 @@ public class Workflow {
             return;
         }
 
-        startMenu();
-        FrontendWorkflow testFrontendWorkflow;
-        if(!testMode) {
-            Organizer organizer;
-            try {
-                
-                FileReader jb = new FileReader(args[1]);
-                FileReader fr = new FileReader(args[0]);
-                Parser p = new Parser(fr,jb);// add job file to fix problem
-                p.start();
-                ArrayList<String> tokens = p.getTokens();
-                organizer = new Organizer(tokens,p.getLine(),p.getJobTokens());
-
-                testFrontendWorkflow = new FrontendWorkflow(organizer);
-                
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }else testFrontendWorkflow = new FrontendWorkflow();
-        
-
+        startMenu(args[0],args[1]);
     }
 
-    public static void startMenu(){
+    public static void startMenu(String workflowName, String jobName){
         Scanner s1=new Scanner(System.in);
 
         System.out.println("Enter 'test' to start the program in test mode,\nEnter 'cancel' to end the program,\nEnter anything else to start the program in the normal mode.");
@@ -63,8 +42,8 @@ public class Workflow {
             Organizer organizer;
             try {
                 
-                FileReader jb = new FileReader("job.txt");
-                FileReader fr = new FileReader("test.txt");
+                FileReader jb = new FileReader(jobName);
+                FileReader fr = new FileReader(workflowName);
                 Parser p = new Parser(fr,jb);// add job file to fix problem
                 p.start();
                 ArrayList<String> tokens = p.getTokens();
@@ -105,7 +84,7 @@ class FrontendWorkflow{
         getArraysFromOrganizer(organizer);
     }
 
-    public FrontendWorkflow(){
+    public FrontendWorkflow(){      //This is for test mode
         
         createTestObjects();
         assignTestObjectsAsMain();
@@ -124,7 +103,7 @@ class FrontendWorkflow{
         tasks = organizer.getTasks();
 
         
-        
+        /*
         for (JobType jobType : jobTypes) {
             for (Task task : jobType.getTasks()) {
                 System.out.println(task.getName());
@@ -132,6 +111,7 @@ class FrontendWorkflow{
         }
 
         System.out.println(tasks.get(0).getName());
+        */
         
         WorkflowManager();
     }
@@ -229,14 +209,6 @@ class FrontendWorkflow{
         tasks = testTasks;
         stations = testStations;
     }
-    ArrayList<Task> sortTasksByEarliestDeadline(ArrayList<Task> inTasks){
-        Collections.sort(inTasks, new TaskComparator());
-        return inTasks;
-    }
-    ArrayList<Job> sortJobsByStartTime(ArrayList<Job> inJobs){
-        Collections.sort(inJobs, new JobComparator());
-        return inJobs;
-    }
     Station getTheFreeStationByJob(tempJob j){
         ArrayList<Station> usableStations = new ArrayList<>();
         for(Station s:stations){
@@ -289,14 +261,14 @@ class FrontendWorkflow{
     }
 
     void extractJobEventsFromJobList(){
-        Collections.sort(jobs, new JobComparator());
+        Collections.sort(jobs, new JobComparator());        //Sort jobs according to their start date
         for(Job job : jobs){
             QueueJobEvent event = new QueueJobEvent(job,job.getStartTime());
             EventAdder(event);
         }
     }
 
-    ArrayList<AddTaskEvent> extractTaskEventsFromJob(Job job){
+    ArrayList<AddTaskEvent> extractTaskEventsFromJob(Job job){      //Extract tasks from jobs and put it in line in relevant stations, handleEvents calls it
         
         ArrayList<AddTaskEvent> jobsAddTaskEvents = new ArrayList<>();
         System.out.println("\nFor Job: " + job.getName());
@@ -379,39 +351,6 @@ class FrontendWorkflow{
             System.out.println("\n");
             if(queueCount + 1 == eventTemplates.size()) break;
             queueCount++;
-        }
-
-
-        if(false)
-        for(Station s : stations){
-            if(!s.isFifoflag()) continue;
-            @SuppressWarnings("unchecked")
-            ArrayList<EventTemplate> reversedEventList = (ArrayList<EventTemplate>) s.getEvents().clone();
-            if(reversedEventList.size() == 0) continue;
-            EventTemplate firstEvent = reversedEventList.getFirst();
-            ArrayList<EventTemplate> newEventList = new ArrayList<EventTemplate>();
-            /* 
-            for(EventTemplate et : reversedEventList){
-                if(et.getClass().getSimpleName()=="RemoveTaskEvent") reversedEventList.remove(et);
-            }
-            */
-            for(int i = 0; i < reversedEventList.size(); i+=2){
-                int ri = reversedEventList.size()-i-1;
-    
-                if(i==0){ 
-                    reversedEventList.get(ri-1).setTime(firstEvent.getTime());
-                    reversedEventList.get(ri).setTime(firstEvent.getTime() + ((AddTaskEvent)reversedEventList.get(ri-1)).getTask().getDuration());
-                    continue;
-                }
-    
-                float ATETime = reversedEventList.get(ri+2).getTime(); 
-                AddTaskEvent ATEEvent = (AddTaskEvent)reversedEventList.get(ri-1);
-                float RTETime = ATETime + ATEEvent.getTask().getDuration();
-                RemoveTaskEvent RTEEvent = (RemoveTaskEvent)reversedEventList.get(ri);
-                ATEEvent.setTime(ATETime);
-                RTEEvent.setTime(RTETime);
-            }
-            Collections.sort(reversedEventList,new EventComparator());
         }
 
         System.out.println();
@@ -518,7 +457,7 @@ class tempJob{
 
 }
 
-class TaskComparator implements Comparator<Task> {
+class TaskComparator implements Comparator<Task> {          //Compare according to their
     public int compare(Task task1, Task task2) {
         if(task1.getValue()==task2.getValue()){
             return 0;
@@ -529,8 +468,7 @@ class TaskComparator implements Comparator<Task> {
         }
     }
 }
-
-class JobComparator implements Comparator<Job> {
+class JobComparator implements Comparator<Job> {        //Sort jobs according to start time
     public int compare(Job job1, Job job2) {
         if(job1.getStartTime()==job2.getStartTime()){
             return 0;
