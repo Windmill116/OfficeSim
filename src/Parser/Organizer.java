@@ -128,7 +128,7 @@ public class Organizer {
           }
         } else {
           stations.getLast().getDefaultTasks().getLast().setSpeed((float) Double.parseDouble(tokens.get(i))); // set speed
-          if (!isValid(tokens.get(i))) { // again check for name of task
+          if (!isValid(tokens.get(i+1))) { // again check for name of task
             i++;
             try {
               stations.getLast().getDefaultTasks().getLast().setPlusMinus((float) Double.parseDouble(tokens.get(i))); // set plus minus

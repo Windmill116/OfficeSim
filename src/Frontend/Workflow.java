@@ -19,10 +19,10 @@ public class Workflow {
     public static void main(String[] args) {
         if(args.length < 2){
             System.out.println("USAGE: java office.jar <workflow file> <job file>");
-            return;
+            //return;
         }
 
-        startMenu(args[0],args[1]);
+        startMenu("test.txt","job.txt");
     }
 
     public static void startMenu(String workflowName, String jobName){
@@ -93,7 +93,6 @@ class FrontendWorkflow{
         WorkflowManager();
     }
     public void getArraysFromOrganizer(Organizer organizer){
-        //jobs = organizer.getJobs();
 
         jobs = organizer.getJobs();
 
@@ -103,20 +102,10 @@ class FrontendWorkflow{
 
         tasks = organizer.getTasks();
 
-        
-        /*
-        for (JobType jobType : jobTypes) {
-            for (Task task : jobType.getTasks()) {
-                System.out.println(task.getName());
-            }
-        }
-
         System.out.println(tasks.get(0).getName());
-        */
         
         WorkflowManager();
     }
-
     private void printWorkflowInfo(){
         System.out.println("---WORKFLOW INFO---");
         System.out.println();
@@ -130,7 +119,11 @@ class FrontendWorkflow{
         System.out.println("Stations:");
         System.out.println();
         for (Station station : stations) {
+            System.out.println();
             System.out.println(station.toString());
+            for(Task t : station.getDefaultTasks()){
+                System.out.print(t.toString() + " ");
+            }
             System.out.println();
         }
         System.out.println();
@@ -141,7 +134,6 @@ class FrontendWorkflow{
             System.out.println();
         }
     }
-
     public void createTestObjects(){
         /*Job1 J1 1 30
         Job2 J1 2 29
@@ -254,13 +246,11 @@ class FrontendWorkflow{
         }
         return leastBusyStation;
     }
-  
     void WorkflowManager(){
         printWorkflowInfo();
         extractJobEventsFromJobList();
         HandleEvents();
     }
-
     void extractJobEventsFromJobList(){
         Collections.sort(jobs, new JobComparator());        //Sort jobs according to their start date
         for(Job job : jobs){
@@ -273,9 +263,7 @@ class FrontendWorkflow{
         
         ArrayList<AddTaskEvent> jobsAddTaskEvents = new ArrayList<>();
         System.out.println("\nFor Job: " + job.getName());
-         
         for(Task t : job.getTasks()){
-            
             Station s = getTheFreeStationByTask(t);
             if(s==null)continue;
             ArrayList<Task> freeStationChannel = s.getFreeChannel();
@@ -331,7 +319,6 @@ class FrontendWorkflow{
                     System.out.println("Task added to the " + addTaskEvent.getTargetStation().getName());
                     break;
                 case "RemoveTaskEvent":
-
                     RemoveTaskEvent removeTaskEvent = (RemoveTaskEvent) currentEvent;
                     System.out.println("Remove task event for: " + removeTaskEvent.getTask().getName());
                     currentTask = removeTaskEvent.getTask();

@@ -70,7 +70,7 @@ public class Job {
 
 
     public String toString(){
-        return this.jobType.toString()+"\nJobID: "+this.jobId+"\nStart time: "+this.startTime+"\nDuration: "+this.duration;
+        return "\nJobID: "+this.jobId+"\n"+this.jobType.toString()+"\nStart time: "+this.startTime+"\nDuration: "+this.duration;
     }
     public ArrayList<EventTemplate> getEventTemplates() {
         return eventTemplates;
