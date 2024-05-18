@@ -12,10 +12,7 @@ public class Station {
     boolean fifoflag;
     float speed;
     float plusMinus;
-
     float durationAddUpForUtilization = 0;
-    
-
     ArrayList<Task> defaultTasks = new ArrayList<>(); 
 
     ArrayList<ArrayList<Task>> taskChannels = new ArrayList<>(); //channels for the multi task stations. If the station isn't multiflagged, get only thee first channel.
@@ -133,7 +130,11 @@ public class Station {
     }
 
     public ArrayList<Task> getFreeChannel(){
-        ArrayList<ArrayList<Task>> allChannels = (ArrayList)taskChannels.clone();
+        
+
+        //test block
+        @SuppressWarnings("unchecked")
+        ArrayList<ArrayList<Task>> allChannels = (ArrayList<ArrayList<Task>>)taskChannels.clone();
         Collections.sort(allChannels, new ChannelComparator());
         return allChannels.get(0);
     }
@@ -145,6 +146,7 @@ public class Station {
         }
         return currentDuration;
     }
+
 }
 
 class ChannelComparator implements Comparator<ArrayList<Task>>{

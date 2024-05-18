@@ -1,9 +1,23 @@
 package Frontend;
 import Parser.*;
+
+import java.text.DecimalFormat;
 import java.util.*;
 
 
 public abstract class EventTemplate implements Comparable<EventTemplate>{
+
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_BLACK = "\u001B[30m";
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_GREEN = "\u001B[32m";
+    public static final String ANSI_YELLOW = "\u001B[33m";
+    public static final String ANSI_BLUE = "\u001B[34m";
+    public static final String ANSI_PURPLE = "\u001B[35m";
+    public static final String ANSI_CYAN = "\u001B[36m";
+    public static final String ANSI_WHITE = "\u001B[37m";
+
+    protected DecimalFormat dF = new DecimalFormat("#.##");
     float time;
     public float getTime() {
         return time;
@@ -92,7 +106,7 @@ class AddTaskEvent extends EventTemplate{
     @Override
     public String toString() {
         //return ("Name: " + task.getName() + " Time: " + time + " Station: " + targetStation.getName());
-        return ("Added task is " + task.getName() + " for job " + jobOfTask.getJobId() + " with a duration of " + task.getDuration()+ " on " + time + " at the station " + targetStation.getName());
+        return (ANSI_GREEN + "Added "+ ANSI_RESET + "task is " + task.getName() + " for job " + jobOfTask.getJobId() + " with a duration of " + dF.format(task.getDuration()) + " on " + dF.format(time) + " at the station " + targetStation.getName());
     }
 }
 class RemoveTaskEvent extends EventTemplate{
@@ -174,7 +188,7 @@ class RemoveTaskEvent extends EventTemplate{
     @Override
     public String toString() {
         //return ("Name: " + task.getName() + " Time: " + time + " Station: " + targetStation.getName());
-        return ("Removed task is " + task.getName() + " for job " + jobOfTask.getJobId() + " with a duration of " + task.getDuration() +  " on " + time + " at the station " + targetStation.getName());
+        return (ANSI_RED + "Removed " + ANSI_RESET + "task is " + task.getName() + " for job " + jobOfTask.getJobId() + " with a duration of " + dF.format(task.getDuration())  +  " on " + dF.format(time) + " at the station " + targetStation.getName());
     }
 }
 
@@ -193,16 +207,21 @@ class QueueJobEvent extends EventTemplate{
 
     @Override
     public String toString() {
-        return ("Job: " + job.getName() + " Time: " + time);
+        return ("<<<<<<<<<< Job: " + job.getName() + " Time: " + time);
     }
 }
 
-class FinishJobEvent{
+class FinishJobEvent extends EventTemplate{
     Job job;
-    float time;
 
     FinishJobEvent(Job job, float time){
         this.job = job;
         this.time = time;
+    }
+
+    @Override
+    public String toString() {
+        // TODO Auto-generated method stub
+        return (">>>>>>>>>> "+job.getName() + " is finished at " + dF.format(time) +  " minutes.");
     }
 }
