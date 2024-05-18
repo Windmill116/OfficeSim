@@ -10,6 +10,7 @@ public class Organizer {
   private ArrayList<Job> jobArrayList = new ArrayList<>();//job array list defined
   private int index = 0, index2 = 0, line = 1, maxLine, parantheses = 0; // int defined
   private boolean newLine = false, error, jobtypesB = false, stationTypesB = false; // booleans defined
+  
   public Organizer(ArrayList<String> tokens, int maxLine,ArrayList<String> jobTokens) { // Constructor
     this.tokens = tokens; // for tokens
     this.maxLine = maxLine; // for maxLine 
@@ -46,7 +47,7 @@ public class Organizer {
         jobErrorDetector(); // start to check job types
         break; // break to end method (loop)
       } else {
-        if (tokens.get(i).startsWith("t")) { // if its start with t it is task
+        if (isValid(tokens.get(i))) { // if its start with t it is task
           tasks.add(new Task(tokens.get(i)));
         } else { // if its not start with t it is value
           tasks.getLast().setValue((float) Double.parseDouble(tokens.get(i))); // convert string (from token) to float to send to last task
@@ -79,7 +80,7 @@ public class Organizer {
           jobs.add(new JobType(tokens.get(i))); // create new jobtype in job arraylist 
         }
       } else { // if its not line token
-        if (tokens.get(i).startsWith("t")) { // if its start with t it is task object
+        if (isValid(tokens.get(i))) { // if its start with t it is task object
           for (Task task : tasks) { // search for task object
             if (task.getName().equals(tokens.get(i)))
               jobs.getLast().getTasks().add(new Task(task.getName(), task.getValue()));  // when method find the same task object ,
@@ -101,36 +102,36 @@ public class Organizer {
       if (tokens.get(i).equals(":line:")) { // if token is line
         try {
           tokens.get(i + 4); // check is it end of the workflow file ??
-          i = i + 2; // if its not skip 
+          i = i + 2; // if its not skip it
           String name = tokens.get(i);
           float maxCapacity = (float) Double.parseDouble(tokens.get(i + 1)); // check max capacity
           boolean mutliFlag = false;
           boolean fifoflag = false;
-          if (tokens.get(i + 2).equals("y"))
+          if (tokens.get(i + 2).equals("y")) // check for multiflag
             mutliFlag = true; // check multiflag
-          if (tokens.get(i + 3).equals("y"))
+          if (tokens.get(i + 3).equals("y")) // check for fifoflag
             fifoflag = true; // check fifoflag
-          stations.add(new Station(name, maxCapacity, mutliFlag, fifoflag, 0, 0));
+          stations.add(new Station(name, maxCapacity, mutliFlag, fifoflag, 0, 0)); // creating new object and add to arraylist
           i = i + 3;
         } catch (Exception e) {
-          jobFileErrorCheck();
+          jobFileErrorCheck(); // if stations are end this code starting.
           break;
         }
 
       } else {
-        if (tokens.get(i).startsWith("t")) {
-          for (Task task : tasks) {
-            if (task.getName().equals(tokens.get(i))) {
-              stations.getLast().getDefaultTasks().add(new Task(task.getName(), task.getValue()));
+        if (isValid(tokens.get(i))) { // check for is name valid ??
+          for (Task task : tasks) { // to find task
+            if (task.getName().equals(tokens.get(i))) { 
+              stations.getLast().getDefaultTasks().add(new Task(task.getName(), task.getValue())); // add defult task to last stations
               break;
             }
           }
         } else {
-          stations.getLast().getDefaultTasks().getLast().setSpeed((float) Double.parseDouble(tokens.get(i)));
-          if (!tokens.get(i + 1).startsWith("t")) {
+          stations.getLast().getDefaultTasks().getLast().setSpeed((float) Double.parseDouble(tokens.get(i))); // set speed
+          if (!isValid(tokens.get(i))) { // again check for name of task
             i++;
             try {
-              stations.getLast().getDefaultTasks().getLast().setPlusMinus((float) Double.parseDouble(tokens.get(i)));
+              stations.getLast().getDefaultTasks().getLast().setPlusMinus((float) Double.parseDouble(tokens.get(i))); // set plus minus
             } catch (Exception e) {
             }
           }
@@ -139,7 +140,6 @@ public class Organizer {
     }
   }
   
-  //*** END OF GET AND SET OBJECTS***
   private void taskErrorDetector() // this method check task errors
   {
     ArrayList<String> tasks2 = new ArrayList<>(); // to check same tasks
@@ -176,7 +176,7 @@ public class Organizer {
         float val = (float) Double.parseDouble(tokens.get(i)); // check is it digit
         if (val < 0) {
           System.out.println("**WORKFLOW FILE** "+ "line: " + line + " " + tokens.get(i) + " The value of this task is negative. Please enter a positive task value.");
-          error = true;
+          error = true; 
         }
       } catch (NumberFormatException e) {
         if (tasks2.contains(tokens.get(i))) // if it is not digit start this code
@@ -186,7 +186,7 @@ public class Organizer {
         } else {
           if (tokens.get(i).equals("(") || tokens.get(i).equals(")"))
             continue;
-          if (tokens.get(i).startsWith("t")) {
+          if (isValid(tokens.get(i))) {
             tasks2.add(tokens.get(i));
           } else {
             error = true;
@@ -200,52 +200,59 @@ public class Organizer {
       organizeTask(); // if there is no error start organizetask
     }
   }
-  private void jobErrorDetector() {
+  private void jobErrorDetector() { // to check job errors
     ArrayList<String> jobs2 = new ArrayList<>();
     for (int i = index2; i < tokens.size(); i++) {
       if (!newLine) {
-        if (tokens.get(i).equals(":line:")) {
+        if (tokens.get(i).equals(":line:")) { // new line
           i++;
           line++;
           newLine = true;
-          if (!tokens.get(i).equals("(")) {
+          if (!tokens.get(i).equals("(")) { // to check (
             System.out.println("**WORKFLOW FILE** "+ "line: " + line + "( is missing.");
             error = true;
           }
           i++;
-          if (jobs2.contains(tokens.get(i))) {
+          if (jobs2.contains(tokens.get(i))) { // to check already defined
             System.out.println("**WORKFLOW FILE** "+ "line: " + line + "   Job type: " + tokens.get(i) + " is already defined.");
             error = true;
           } else {
-            jobs2.add(tokens.get(i));
+            if(isValid(tokens.get(i))) // to check valid job type
+            {
+                jobs2.add(tokens.get(i)); // add new job name
+            }else
+            {
+                error = true; // if name is invalid
+                System.out.println("**WORKFLOW FILE** "+ "Line " + line + " Invalid job type: \"" + tokens.get(i) + "\" Please change the name.");
+            }
           }
         }
         continue;
       }
       if (newLine) {
-        if (tokens.get(i).equals(")"))
+        if (tokens.get(i).equals(")")) // ignore )
           continue;
 
-        if (tokens.get(i).equals(":line:")) {
-          if (tokens.get(i + 1).equals("stations") || tokens.get(i + 2).equals("stations")) {
+        if (tokens.get(i).equals(":line:")) { // in every line this code is starting
+          if (tokens.get(i + 1).equals("stations") || tokens.get(i + 2).equals("stations")) { // to check is it end of the stations
             // to do end the checker
-            if (!tokens.get(i - 1).equals(")")) {
+            if (!tokens.get(i - 1).equals(")")) { // to check )
               System.out.println("**WORKFLOW FILE** "+ "line: " + line + ") is missing.");
               error = true;
             }
-            if (!tokens.get(i - 2).equals(")")) {
+            if (!tokens.get(i - 2).equals(")")) { // to check )
               System.out.println("**WORKFLOW FILE** "+ "line: " + line + ") is missing.");
               error = true;
             }
-            error(error, "jobs");
+            error(error, "jobs"); // to check is there any error if its stop the program
             if (!error) {
               index2 = i;
-              organizeJobTypes();
+              organizeJobTypes(); // if there is no error start organizeJobTypes
             }
             break;
           }
           newLine = false;
-          if (!tokens.get(i - 1).equals(")")) {
+          if (!tokens.get(i - 1).equals(")")) { // check for )
             System.out.println("**WORKFLOW FILE** "+ "line: " + line + ") is missing.");
             error = true;
           }
@@ -253,20 +260,20 @@ public class Organizer {
           continue;
         }
         try {
-          float val = (float) Double.parseDouble(tokens.get(i));
-          if (val < 0) {
+          float val = (float) Double.parseDouble(tokens.get(i)); // check for is it number
+          if (val < 0) { // if it is check for is it negative ?
             System.out.println("**WORKFLOW FILE** "+ "line: " + line + " " + tokens.get(i) + " The value of this task is negative. Please enter a positive task value. ");
             error = true;
           }
         } catch (NumberFormatException e) {
           boolean already = false;
           for (Task taskName : tasks) {
-            if (taskName.getName().equals(tokens.get(i))) {
+            if (taskName.getName().equals(tokens.get(i))) { // check is task name defined before tasks
               try {
-                float val = (float) Double.parseDouble(tokens.get(i + 1));
+                float val = (float) Double.parseDouble(tokens.get(i + 1)); // check is it number i+1 (task value) ??
 
               } catch (Exception x) {
-                if (taskName.getValue() == -1) {
+                if (taskName.getValue() == -1) { // check for is task value defined before ??
                   System.out.println("**WORKFLOW FILE** "+ "line: " + line + " task: " + tokens.get(i) + " The value of this task has not been defined in TASKTYPES, or JOBTYPES.");
                   error = true;
                 }
@@ -275,7 +282,7 @@ public class Organizer {
               break;
             }
           }
-          if (!already) {
+          if (!already) { // check is it defined in tasktypes before ??
             System.out.println("**WORKFLOW FILE** " + "line : " + line + " task : " + tokens.get(i) + " is not defined at tasktypes ");
             error = true;
           }
@@ -283,14 +290,13 @@ public class Organizer {
       }
     }
   }
-  private void StationErrorDetector() {
-    // start with line 7
-    ArrayList<String> stations2 = new ArrayList<>();
+  private void StationErrorDetector() { // to check station errors
+    ArrayList<String> stations2 = new ArrayList<>(); 
     ArrayList<String> tmpTask = new ArrayList<>();
     newLine = false;
-    index2 = index2 + 1;
+    index2 = index2 + 1; // to skip useless tokens
     line++;
-    if (!tokens.get(index2).equals("(")) {
+    if (!tokens.get(index2).equals("(")) { // to check (
       System.out.println("**WORKFLOW FILE** "+ "line: " + line + "( is missing");
       error = true;
     }
@@ -301,22 +307,29 @@ public class Organizer {
         {
           i++;
           newLine = true;
-          if (!tokens.get(i).equals("(")) {
-            System.out.println("**WORKFLOW FILE** "+ "line : " + line + "(" + " is not defined");
+          if (!tokens.get(i).equals("(")) { // check for (
+            System.out.println("**WORKFLOW FILE** "+ "line : " + line + "(" + " is not defined"); 
             error = true;
           } else {
             i++;
           }
-          if (stations2.contains(tokens.get(i))) {
+          if (stations2.contains(tokens.get(i))) { // check for already defined
             System.out.println("**WORKFLOW FILE** "+ "line : " + line + " station type :" + tokens.get(i) + " is already defined");
             error = true;
           } else {
-            stations2.add(tokens.get(i));
+            if(isValid(tokens.get(i))) // check for is station name is valid ?
+            {
+                stations2.add(tokens.get(i)); // if it is add station name to station name list
+            }else
+            {
+            error = true; // if its not valid start this code
+            System.out.println("**WORKFLOW FILE** "+ "Line " + line + " Invalid station type: \"" + tokens.get(i) + "\" Please change the name.");
+            } 
           }
           i++;
           try {
-            float val = (float) Double.parseDouble(tokens.get(i));
-            if (val < 0) {
+            float val = (float) Double.parseDouble(tokens.get(i)); // check is it a number?
+            if (val < 0) { // if it is check is it negative
               System.out.println("**WORKFLOW FILE** "+ "line : " + line + tokens.get(i) + " The value of this station speed is negative. Please enter a positive speed value.");
               error = true;
             }
@@ -327,7 +340,7 @@ public class Organizer {
           i++;
           try {
             float val = (float) Double.parseDouble(tokens.get(i));
-            System.out.println("**WORKFLOW FILE** "+ "line : " + line + " " + tokens.get(i) + " is not Y(yes) or N(no). Please enter a valid character.");
+            System.out.println("**WORKFLOW FILE** "+ "line : " + line + " " + tokens.get(i) + " is not Y(yes) or N(no) it is a number. Please enter a valid character.");
             error = true;
           } catch (Exception e) {
             if (!tokens.get(i).equals("y") && !tokens.get(i).equals("n")) {
@@ -338,7 +351,7 @@ public class Organizer {
           i++;
           try {
             float val = (float) Double.parseDouble(tokens.get(i));
-            System.out.println("**WORKFLOW FILE** "+ "line : " + line + " " + tokens.get(i) + " is not Y(yes) or N(no). Please enter valid character.");
+            System.out.println("**WORKFLOW FILE** "+ "line : " + line + " " + tokens.get(i) + " is not Y(yes) or N(no) it is a number. Please enter valid character.");
             error = true;
           } catch (Exception e) {
             if (!tokens.get(i).equals("y") && !tokens.get(i).equals("n")) {
@@ -347,13 +360,13 @@ public class Organizer {
             }
           }
         }
-      } else {
-        if (tokens.get(i).equals(")"))
+      } else {// for end of the station objects check last values
+        if (tokens.get(i).equals(")")) // check for )
           continue;
-        if (tokens.get(i).equals(":line:")) {
+        if (tokens.get(i).equals(":line:")) { // if token is a line line++
           line++;
           if (line == maxLine) {
-            if (!tokens.get(i - 1).equals(")")) {
+            if (!tokens.get(i - 1).equals(")")) { // check for )
               System.out.println("**WORKFLOW FILE** "+ "line: " + line + " ) is missing.");
               error = true;
             }
@@ -361,7 +374,7 @@ public class Organizer {
               System.out.println("**WORKFLOW FILE** "+ "line: " + line + " ) is missing.");
               error = true;
             }
-            error(error, "Station");
+            error(error, "Station"); // if there is a error end the program
             if (!error) {
                 
                 for (int j = index; j < tokens.size(); j++) {
@@ -374,8 +387,8 @@ public class Organizer {
                        }
                     }
                 }
-                for (JobType job : jobs) {
-                    
+                for (JobType job : jobs) { // this code check for task defined in jobs and tasktypes
+                                                        // but not in stations
                     for (Task task : job.getTasks()) {
                         boolean defined = false;
                         for (String string : tmpTask) {
@@ -395,8 +408,8 @@ public class Organizer {
                         }
                         
                     }
-                }
-              for (Task task : tasks) {
+                } // end of the code
+              for (Task task : tasks) { // this code check for task defined but not used in anywhere
                 boolean defined = false;
                 for (String string : tmpTask) {
                   if (defined)
@@ -434,14 +447,14 @@ public class Organizer {
           i = i - 1;
           continue;
         }
-        try {
+        try { // check for number
           float val = (float) Double.parseDouble(tokens.get(i));
-          if (val <= 0) {
+          if (val <= 0) { // if its a number but not positive
             System.out.println("**WORKFLOW FILE** "+ "line: " + line + " "  + " The value of this task is invalid. Please enter a positive or bigger than 0 task value.");
             error = true;
           }
         } catch (NumberFormatException e) {
-          boolean already = false;
+          boolean already = false; // this code for if you defined task in stations but not in tasktypes
 
           for (Task taskName : tasks) {
             if (taskName.getName().equals(tokens.get(i))) {
@@ -455,8 +468,8 @@ public class Organizer {
             error = true;
           }
             try {
-                float val = (float) Double.parseDouble(tokens.get(i+1));
-            } catch (Exception a) {
+                float val = (float) Double.parseDouble(tokens.get(i+1)); // this one for speed you HAVE TO DEFINE SPEED
+            } catch (Exception a) {                                          // (desing choice)
                 
                 System.out.println("**WORKFLOW FILE** "+ "line: " + line + " " +tokens.get(i) + " The speed of this task is not defined. Please enter a positive or bigger than 0 task value.");
                 error = true;
@@ -466,46 +479,53 @@ public class Organizer {
     }
   }
   private void error(boolean error, String text) {
-    if (error)
+    if (error) // if there is a error start this code
     {
         System.err.println("Before starting the program please fix " + text + " errors."+ "\nDo not forget these errors are only " + text + " errors, there may be more errors in other variables.");
-         System.exit(0);
+         System.exit(0); // close the program
     }
       
   }//*** End of the workflow file methods**//
-  private void jobOrganizer() {
+  private void jobOrganizer() { // this code for organize jobs
       for (int i = 0; i < jobTokens.size(); i++) {
-         if(jobTokens.get(i).equals(":line:"))
+         if(jobTokens.get(i).equals(":line:")) //if there is a new line
          {
              i++;
-             jobArrayList.add(new Job(jobTokens.get(i),null,-1,-1));
+             jobArrayList.add(new Job(jobTokens.get(i),null,-1,-1)); // add new job object to arraylist
          }else
          {
-             for (JobType jobType : jobs) {
+             for (JobType jobType : jobs) {  // to understand which job type  we  defined in job object
                  if(jobType.getName().equals(jobTokens.get(i)))
-                 {
+                 { 
                      jobArrayList.getLast().setJobType(new JobType(jobType.getTasks(),jobType.getName()));
-                     i++;
+                     i++; // add jobe type to job object (last one in job array)
                      break;
                  }
-             }
+             }// add other variables
             jobArrayList.get(jobArrayList.size() - 1).setStartTime((float) Double.parseDouble(jobTokens.get(i)));
             i++;
             jobArrayList.get(jobArrayList.size() - 1).setDuration((float) Double.parseDouble(jobTokens.get(i)));
          }  
       }
   }
-  private void jobFileErrorCheck() {
-    line = 1;
+  private void jobFileErrorCheck() { // to check job file errors
+    line = 1; // to reset the line
     ArrayList<String> jobStrings = new ArrayList<>();
     for (int i = 0; i < jobTokens.size(); i++) {
       if (jobTokens.get(i).equals(":line:")) {
-        line++;
+        line++; // to increase line
         i++;
         if (!jobStrings.contains(jobTokens.get(i))) {
-          jobStrings.add(jobTokens.get(i));
+          if(isValid(jobTokens.get(i)))
+          {
+              jobStrings.add(jobTokens.get(i));
+          }else
+          { // if name of the job is not valid 
+              error = true;
+              System.out.println("**WORKFLOW FILE** "+ "Line " + line + " Invalid job: \"" + jobTokens.get(i) + "\" Please change the name.");
+          }
         } else {
-          error = true;
+          error = true; 
           System.out.println("**JOB FILE** "+ "Line " + line + ": You already defined " + jobTokens.get(i));
         }
         i++;
@@ -550,5 +570,8 @@ public class Organizer {
     }
     public ArrayList<Job> getJobs() {
         return jobArrayList;
+    }
+    public static boolean isValid(String str) { // is valid code (check for is names of objects are valid ??)
+        return str.matches("^[^0-9].{1,}$"); // our pattern
     }
 }
