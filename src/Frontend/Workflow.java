@@ -18,14 +18,19 @@ import Frontend.*;
 public class Workflow {
     static boolean testMode = false;
     public static void main(String[] args) {
+        if(args.length < 2){
+            System.out.println("USAGE: java office.jar <workflow file> <job file>");
+            return;
+        }
+
         startMenu();
         FrontendWorkflow testFrontendWorkflow;
         if(!testMode) {
             Organizer organizer;
             try {
                 
-                FileReader jb = new FileReader("job.txt");
-                FileReader fr = new FileReader("test.txt");
+                FileReader jb = new FileReader(args[1]);
+                FileReader fr = new FileReader(args[0]);
                 Parser p = new Parser(fr,jb);// add job file to fix problem
                 p.start();
                 ArrayList<String> tokens = p.getTokens();
