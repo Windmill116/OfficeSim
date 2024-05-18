@@ -4,6 +4,7 @@ import java.util.*;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DecimalFormat;
 
 import Parser.*;
 import Frontend.*;
@@ -17,7 +18,7 @@ import Frontend.*;
 public class Workflow {
     static boolean testMode = false;
     public static void main(String[] args) {
-        
+        startMenu();
         FrontendWorkflow testFrontendWorkflow;
         if(!testMode) {
             Organizer organizer;
@@ -100,6 +101,7 @@ class FrontendWorkflow{
     }
 
     public FrontendWorkflow(){
+        
         createTestObjects();
         assignTestObjectsAsMain();
 
@@ -262,7 +264,7 @@ class FrontendWorkflow{
         }
         if(usableStations.size()==0) return null;
 
-        int leastCount = 1000;
+        int leastCount = 9999;
         Station leastBusyStation = new Station(null, leastCount, false, false, leastCount, leastCount);
         for(Station s: usableStations){
             if(leastCount>s.getFreeChannel().size()) {
@@ -303,7 +305,9 @@ class FrontendWorkflow{
             if(s.getEvents().size()==0){
                 startTime = job.getStartTime();
             }else{
-                startTime = s.getEvents().getLast().getTime();
+                if(job.getStartTime()>s.getEvents().getLast().getTime()){
+                    startTime = job.getStartTime();
+                }else startTime = s.getEvents().getLast().getTime();
             }
 
             AddTaskEvent addTaskEvent = new AddTaskEvent(startTime,currentTask,s,freeStationChannel);
@@ -320,18 +324,8 @@ class FrontendWorkflow{
             EventAdder(removeTaskEvent);
         }
         job.calculateJobTardiness();
-
-        /* 
-        Task taskToUse = job.getTasks().getFirst();
-        Station s = getTheFreeStationByTask(taskToUse);
-        ArrayList<Task> freeStationChannel = s.getFreeChannel();
-        Task currentTask = getTaskFromStationByName(taskToUse, s);
-        System.out.println("got duration " + currentTask.getDuration());
-        AddTaskEvent event = new AddTaskEvent(job.getStartTime(),currentTask,s,freeStationChannel);
-        EventAdder(event);
-        jobsAddTaskEvents.add(event);
-        */
-
+        FinishJobEvent finishJobEvent = new FinishJobEvent(job, job.getSimulativeFinishTime());
+        EventAdder(finishJobEvent);
         return jobsAddTaskEvents;
     }
 
@@ -340,6 +334,7 @@ class FrontendWorkflow{
     }
     
     void HandleEvents(){
+        DecimalFormat dF = new DecimalFormat("#.##");
         int queueCount = 0;
         EventTemplate currentEvent;
         Task currentTask;
@@ -353,19 +348,6 @@ class FrontendWorkflow{
                     currentTask = addTaskEvent.getTask();
                     addTaskEvent.getTargetChannel().add(currentTask);
                     System.out.println("Task added to the " + addTaskEvent.getTargetStation().getName());
-
-                    /* *
-                    AddTaskEvent addTaskEvent = (AddTaskEvent)currentEvent;
-                    Task task = addTaskEvent.getTask();
-                    //addTaskEvent.getTargetChannel().add(task);
-                    System.out.println("Task: " + task.getName() + " is added to the queue of " + addTaskEvent.getTargetChannel().size() + " at channel " + addTaskEvent.getTargetStation().getTaskChannels().indexOf(addTaskEvent.getTargetChannel()));
-                    addTaskEvent.setDone(true);
-
-                    RemoveTaskEvent removeTaskEventOfTask = new RemoveTaskEvent(addTaskEvent.getTime() + task.getDuration(), task,addTaskEvent.getTargetStation(),addTaskEvent.getTargetChannel());
-                    EventAdder(removeTaskEventOfTask);
-                    System.out.println(addTaskEvent.getTime() + task.getDuration() +  " bug check");
-                    break;
-                    */
                     break;
                 case "RemoveTaskEvent":
 
@@ -374,20 +356,6 @@ class FrontendWorkflow{
                     currentTask = removeTaskEvent.getTask();
                     removeTaskEvent.getTargetChannel().remove(currentTask);
                     System.out.println("Task removed from: " + removeTaskEvent.getTargetStation().getName());
-
-                    /* 
-                    RemoveTaskEvent removeTaskEvent = (RemoveTaskEvent)currentEvent;
-                    System.out.println("Remove task " + removeTaskEvent.getTask().getName());
-                    removeTaskEvent.setDone(true);
-                    Task currentTask = removeTaskEvent.getTask();
-                    removeTaskEvent.getTargetChannel().remove(currentTask);
-
-                    if(removeTaskEvent.getTargetChannel().size()==0)break;
-                    else{System.out.println(currentTask.getName());}
-                    Task nextTask = removeTaskEvent.getTargetChannel().getFirst();
-                    AddTaskEvent nextAddTaskEvent = new AddTaskEvent(removeTaskEvent.getTime(), nextTask, removeTaskEvent.getTargetStation());
-                    System.out.println("Next event time: " + nextAddTaskEvent.getTime())
-                    */
                     break;
                 case "QueueJobEvent":
                     System.out.println("QueueJobEvent");
@@ -397,18 +365,46 @@ class FrontendWorkflow{
                     queueJobEvent.setDone(true);
                     break;
                 case "FinishJobEvent":
-                    break;
-                
-                
+                    break; 
             }
-
-            
             Collections.sort(eventTemplates, new EventComparator());
             System.out.println("\n");
             if(queueCount + 1 == eventTemplates.size()) break;
             queueCount++;
         }
 
+
+        if(false)
+        for(Station s : stations){
+            if(!s.isFifoflag()) continue;
+            @SuppressWarnings("unchecked")
+            ArrayList<EventTemplate> reversedEventList = (ArrayList<EventTemplate>) s.getEvents().clone();
+            if(reversedEventList.size() == 0) continue;
+            EventTemplate firstEvent = reversedEventList.getFirst();
+            ArrayList<EventTemplate> newEventList = new ArrayList<EventTemplate>();
+            /* 
+            for(EventTemplate et : reversedEventList){
+                if(et.getClass().getSimpleName()=="RemoveTaskEvent") reversedEventList.remove(et);
+            }
+            */
+            for(int i = 0; i < reversedEventList.size(); i+=2){
+                int ri = reversedEventList.size()-i-1;
+    
+                if(i==0){ 
+                    reversedEventList.get(ri-1).setTime(firstEvent.getTime());
+                    reversedEventList.get(ri).setTime(firstEvent.getTime() + ((AddTaskEvent)reversedEventList.get(ri-1)).getTask().getDuration());
+                    continue;
+                }
+    
+                float ATETime = reversedEventList.get(ri+2).getTime(); 
+                AddTaskEvent ATEEvent = (AddTaskEvent)reversedEventList.get(ri-1);
+                float RTETime = ATETime + ATEEvent.getTask().getDuration();
+                RemoveTaskEvent RTEEvent = (RemoveTaskEvent)reversedEventList.get(ri);
+                ATEEvent.setTime(ATETime);
+                RTEEvent.setTime(RTETime);
+            }
+            Collections.sort(reversedEventList,new EventComparator());
+        }
 
         System.out.println();
         Collections.sort(eventTemplates, new EventComparator());
@@ -417,17 +413,19 @@ class FrontendWorkflow{
         }
         System.out.println();
         for(Station s : stations){
-            System.out.print("At station " + s.getName() + " Channel queues ");
-            for(ArrayList<Task> i : s.getTaskChannels()){
-                System.out.print(i.size() + " ");
-                if(i.size()!=0)System.out.print(i.get(0).getName() + " ");
-            }
             float lastEventTime = eventTemplates.getLast().getTime();
-            System.out.println("Utilization for " + s.getName() + " is %" +(s.getDurationAddUpForUtilization()/lastEventTime)*100);
+            System.out.println("Utilization for " + s.getName() + " is %" +dF.format((s.getDurationAddUpForUtilization()/lastEventTime)*100));
         }
         System.out.println();
         for(Job job : jobs){
-            System.out.println(job.getName() + " tardiness: " + job.getJobTardiness());
+            if(job.getJobTardiness()>0){
+                System.out.println(job.getName() + " tardiness is " + dF.format(job.getJobTardiness()) + " minutes.");
+            }else if(job.getJobTardiness()<0){
+                System.out.println(job.getName() + " finished " + dF.format(-job.getJobTardiness())+" minutes early.");
+            }else{
+                System.out.println("Job finished just in time.");
+            }
+            
         }
     }
 

@@ -9,6 +9,12 @@ public class Job {
     private float duration;
     private String jobId;
     private float jobTardiness = 0;
+    private float jobFinishTime = 0;
+    private float simulativeFinishTime = 0;
+    
+
+    
+
     
 
     ArrayList<Task> tasks = new ArrayList<Task>();
@@ -79,8 +85,9 @@ public class Job {
     }
 
     public void calculateJobTardiness(){
-        float jobFinishTime = getDuration() + getStartTime();
+        jobFinishTime = getDuration() + getStartTime();
         float lastEventTime = getEventTemplates().getLast().getTime();
+        simulativeFinishTime = lastEventTime;
         jobTardiness = lastEventTime - jobFinishTime;
     }
 
@@ -90,5 +97,20 @@ public class Job {
 
     public void setJobTardiness(float jobTardiness) {
         this.jobTardiness = jobTardiness;
+    }
+
+    public float getJobFinishTime() {
+        return jobFinishTime;
+    }
+
+    public void setJobFinishTime(float jobFinishTime) {
+        this.jobFinishTime = jobFinishTime;
+    }
+    public float getSimulativeFinishTime() {
+        return simulativeFinishTime;
+    }
+
+    public void setSimulativeFinishTime(float simulativeFinishTime) {
+        this.simulativeFinishTime = simulativeFinishTime;
     }
 }
