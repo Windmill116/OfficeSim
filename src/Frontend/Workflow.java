@@ -119,7 +119,11 @@ class FrontendWorkflow{
         System.out.println("Stations:");
         System.out.println();
         for (Station station : stations) {
+            System.out.println();
             System.out.println(station.toString());
+            for(Task t : station.getDefaultTasks()){
+                System.out.print(t.toString() + " ");
+            }
             System.out.println();
         }
         System.out.println();
@@ -221,7 +225,6 @@ class FrontendWorkflow{
             
             boolean canUseStation=false;
             for(Task sTask : s.getDefaultTasks()){
-                System.out.println(sTask.getName() + " " + t.getName());
                 if(sTask.getName().equals(t.getName())){
                     canUseStation=true;
                 }

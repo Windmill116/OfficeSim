@@ -159,7 +159,7 @@ public class Station {
         } else{
             multi="N";
         }
-        return this.name.toUpperCase()+":\nFIFOFLAG: "+fifo+"\nMULTIFLAG: "+multi+"\nMax capacity: "+this.maxCapacity;
+        return this.name.toUpperCase()+":\nFIFOFLAG: "+fifo+"\nMULTIFLAG: "+multi+"\nMax capacity: "+this.maxCapacity+"\nTasks: " + getDefaultTasks().size();
     }
 
     public void printWhatTasksAreExecuting(){
