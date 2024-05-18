@@ -52,7 +52,8 @@ public class Workflow {
                 testFrontendWorkflow = new FrontendWorkflow(organizer);
                 
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println("DEFINE OBJECTS LINE BY LINE DO NOT PUT OBJECTS IN SAME LINE");
+                System.exit(0);
             }
         }
     }
