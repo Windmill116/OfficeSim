@@ -163,6 +163,15 @@ public class Station {
         }
         return this.name.toUpperCase()+":\nFIFOFLAG: "+fifo+"\nMULTIFLAG: "+multi+"\nMax capacity: "+this.maxCapacity;
     }
+
+    public void printWhatTasksAreExecuting(){
+        System.out.print("\nFor " + this.name + " station running tasks are ");
+        for(ArrayList<Task> taskChannel : taskChannels){
+            if(taskChannel.size()==0)continue;
+            System.out.print(taskChannel.getLast().getName() + " ");
+        }
+        System.out.println();
+    }
 }
 
 class ChannelComparator implements Comparator<ArrayList<Task>>{
