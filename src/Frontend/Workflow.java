@@ -235,6 +235,7 @@ class FrontendWorkflow{
     Station getTheFreeStationByJob(tempJob j){
         ArrayList<Station> usableStations = new ArrayList<>();
         for(Station s:stations){
+            
             boolean canUseStation=false;
             for(Task task: j.getTasks()){
                 if(s.getDefaultTasks().contains(task)){
@@ -251,6 +252,7 @@ class FrontendWorkflow{
     Station getTheFreeStationByTask(Task t){
         ArrayList<Station> usableStations = new ArrayList<>();
         for(Station s:stations){
+            
             boolean canUseStation=false;
             for(Task sTask : s.getDefaultTasks()){
                 if(sTask.getName().equals(t.getName())){
@@ -347,6 +349,7 @@ class FrontendWorkflow{
                     System.out.println("Add Task Event for: " + addTaskEvent.getTask().getName());
                     currentTask = addTaskEvent.getTask();
                     addTaskEvent.getTargetChannel().add(currentTask);
+                    addTaskEvent.getTargetStation().printWhatTasksAreExecuting();
                     System.out.println("Task added to the " + addTaskEvent.getTargetStation().getName());
                     break;
                 case "RemoveTaskEvent":
