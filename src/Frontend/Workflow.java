@@ -4,6 +4,7 @@ import java.util.*;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DecimalFormat;
 
 import Parser.*;
 import Frontend.*;
@@ -17,7 +18,7 @@ import Frontend.*;
 public class Workflow {
     static boolean testMode = false;
     public static void main(String[] args) {
-        
+        startMenu();
         FrontendWorkflow testFrontendWorkflow;
         if(!testMode) {
             Organizer organizer;
@@ -100,6 +101,7 @@ class FrontendWorkflow{
     }
 
     public FrontendWorkflow(){
+        
         createTestObjects();
         assignTestObjectsAsMain();
 
@@ -380,6 +382,7 @@ class FrontendWorkflow{
             queueCount++;
         }
 
+        DecimalFormat dF = new DecimalFormat("#.##");
 
         System.out.println();
         Collections.sort(eventTemplates, new EventComparator());
@@ -388,17 +391,19 @@ class FrontendWorkflow{
         }
         System.out.println();
         for(Station s : stations){
-            System.out.print("At station " + s.getName() + " Channel queues ");
-            for(ArrayList<Task> i : s.getTaskChannels()){
-                System.out.print(i.size() + " ");
-                if(i.size()!=0)System.out.print(i.get(0).getName() + " ");
-            }
             float lastEventTime = eventTemplates.getLast().getTime();
-            System.out.println("Utilization for " + s.getName() + " is %" +(s.getDurationAddUpForUtilization()/lastEventTime)*100);
+            System.out.println("Utilization for " + s.getName() + " is %" +dF.format((s.getDurationAddUpForUtilization()/lastEventTime)*100));
         }
         System.out.println();
         for(Job job : jobs){
-            System.out.println(job.getName() + " tardiness: " + job.getJobTardiness());
+            if(job.getJobTardiness()>0){
+                System.out.println(job.getName() + " tardiness is " + dF.format(job.getJobTardiness()) + " minutes.");
+            }else if(job.getJobTardiness()<0){
+                System.out.println(job.getName() + " finished " + dF.format(-job.getJobTardiness())+" minutes early.");
+            }else{
+                System.out.println("Job finished just in time.");
+            }
+            
         }
     }
 
