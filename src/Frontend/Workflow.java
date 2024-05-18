@@ -146,7 +146,7 @@ class FrontendWorkflow{
             System.out.println();
         }
         System.out.println();
-        System.out.println("Jobs:");
+        System.out.println("Job types:");
         System.out.println();
         for (Job job : jobs) {
             System.out.println(job.toString());
