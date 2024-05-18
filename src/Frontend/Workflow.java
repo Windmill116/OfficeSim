@@ -108,7 +108,6 @@ class FrontendWorkflow{
         WorkflowManager();
     }
     public void getArraysFromOrganizer(Organizer organizer){
-        //jobs = organizer.getJobs();
 
         jobs = organizer.getJobs();
 
@@ -118,19 +117,10 @@ class FrontendWorkflow{
 
         tasks = organizer.getTasks();
 
-        
-        
-        for (JobType jobType : jobTypes) {
-            for (Task task : jobType.getTasks()) {
-                System.out.println(task.getName());
-            }
-        }
-
         System.out.println(tasks.get(0).getName());
         
         WorkflowManager();
     }
-
     private void printWorkflowInfo(){
         System.out.println("---WORKFLOW INFO---");
         System.out.println();
@@ -155,7 +145,6 @@ class FrontendWorkflow{
             System.out.println();
         }
     }
-
     public void createTestObjects(){
         /*Job1 J1 1 30
         Job2 J1 2 29
@@ -276,13 +265,11 @@ class FrontendWorkflow{
         }
         return leastBusyStation;
     }
-  
     void WorkflowManager(){
         printWorkflowInfo();
         extractJobEventsFromJobList();
         HandleEvents();
     }
-
     void extractJobEventsFromJobList(){
         Collections.sort(jobs, new JobComparator());
         for(Job job : jobs){
@@ -290,7 +277,6 @@ class FrontendWorkflow{
             EventAdder(event);
         }
     }
-
     ArrayList<AddTaskEvent> extractTaskEventsFromJob(Job job){
         
         ArrayList<AddTaskEvent> jobsAddTaskEvents = new ArrayList<>();
@@ -353,7 +339,6 @@ class FrontendWorkflow{
                     System.out.println("Task added to the " + addTaskEvent.getTargetStation().getName());
                     break;
                 case "RemoveTaskEvent":
-
                     RemoveTaskEvent removeTaskEvent = (RemoveTaskEvent) currentEvent;
                     System.out.println("Remove task event for: " + removeTaskEvent.getTask().getName());
                     currentTask = removeTaskEvent.getTask();

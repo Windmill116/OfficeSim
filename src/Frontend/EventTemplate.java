@@ -19,13 +19,13 @@ public abstract class EventTemplate implements Comparable<EventTemplate>{
 
     protected DecimalFormat dF = new DecimalFormat("#.##");
     float time;
+    boolean done = false;
     public float getTime() {
         return time;
     }
     public void setTime(float time) {
         this.time = time;
     }
-    boolean done = false;
     public boolean isDone() {
         return done;
     }
@@ -191,7 +191,6 @@ class RemoveTaskEvent extends EventTemplate{
         return (ANSI_RED + "Removed " + ANSI_RESET + "task is " + task.getName() + " for job " + jobOfTask.getJobId() + " with a duration of " + dF.format(task.getDuration())  +  " on " + dF.format(time) + " at the station " + targetStation.getName());
     }
 }
-
 
 class QueueJobEvent extends EventTemplate{
     Job job;

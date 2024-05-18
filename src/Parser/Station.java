@@ -115,7 +115,7 @@ public class Station {
             return false;
         }
     }
-    
+    /* 
     public double calculateSpeed(){
         if(this.isPlusMinus()){
             Random r1=new Random(System.currentTimeMillis());
@@ -128,11 +128,9 @@ public class Station {
             return (double)this.speed;
         }
     }
+    */
 
     public ArrayList<Task> getFreeChannel(){
-        
-
-        //test block
         @SuppressWarnings("unchecked")
         ArrayList<ArrayList<Task>> allChannels = (ArrayList<ArrayList<Task>>)taskChannels.clone();
         Collections.sort(allChannels, new ChannelComparator());
