@@ -62,8 +62,9 @@ public class Task {
     public void calculateDuration(){
         if(plusMinus!=0){
             Random random = new Random(System.nanoTime());
-            Float num = random.nextFloat(1)*plusMinus + value/speed;
+            Float num = value/(speed + random.nextFloat(1)*plusMinus);
             duration = num;
+            System.out.println(duration + " DURATION " +random.nextFloat(1));
         }else{
             duration = value/speed;
         }
