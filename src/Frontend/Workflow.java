@@ -75,8 +75,6 @@ class FrontendWorkflow{
     private ArrayList<Station> stations;
     private ArrayList<Task> tasks;
 
-    ArrayList<Object> eventList = new ArrayList<>();
-
     ArrayList<EventTemplate> eventTemplates = new ArrayList<EventTemplate>();
 
     Organizer organizer;
@@ -86,6 +84,7 @@ class FrontendWorkflow{
     public FrontendWorkflow(Organizer organizer){
         this.organizer = organizer;
         getArraysFromOrganizer(organizer);
+        WorkflowManager();
     }
     /*
      * Extracts data from the organizer and starts the workflow manager.
@@ -101,7 +100,7 @@ class FrontendWorkflow{
 
         tasks = organizer.getTasks();
         
-        WorkflowManager();
+        
     }
     /*
      * Prints the workflow information including tasks, stations, and job types.
