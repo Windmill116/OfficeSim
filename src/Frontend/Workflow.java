@@ -374,7 +374,6 @@ class FrontendWorkflow{
             if(sTask.getName().equals(t.getName())){
                 Task t1 = sTask;
                 t1.setValue(t.getValue());
-                System.out.println(s.getName() + " " + t1.getName());
                 t1.calculateDuration();
                 return t1;
             }
