@@ -8,21 +8,29 @@ import java.text.DecimalFormat;
 
 import Parser.*;
 
-/*NOTES
- * 1- I will assume that the Jobs go one by one and tasks arent mixed but rather done Job by Job.
- * 2- I will assume that the Job will select the station with the least job first.
+/*
+ * This is the main class for the whole program. 
+ * It is responsible for managing the workflow and 
+ * calling the appropriate functions to handle events 
+ * and update the program's state.
+ * 
+ * 
  */
 
-
 public class Workflow {
-    static boolean testMode = false;
     public static void main(String[] args) {
+        
         if(args.length < 2){
             System.out.println("USAGE: java office.jar <workflow file> <job file>");
+            System.out.println("Arguments not found, will run on test mode.");
+            startMenu("dataProvided.txt","job.txt");
             //return;
+        }else{
+            System.out.println("Arguments found, will run on normal mode.");
+            startMenu(args[0],args[1]);
         }
 
-        startMenu("dataProvided.txt","job.txt");
+        
     }
 
     public static void startMenu(String workflowName, String jobName){
@@ -71,10 +79,16 @@ class FrontendWorkflow{
     ArrayList<EventTemplate> eventTemplates = new ArrayList<EventTemplate>();
 
     Organizer organizer;
+    /*
+     * Constructor that initializes the workflow with the given Organizer.
+     */
     public FrontendWorkflow(Organizer organizer){
         this.organizer = organizer;
         getArraysFromOrganizer(organizer);
     }
+    /*
+     * Extracts data from the organizer and starts the workflow manager.
+     */
     public void getArraysFromOrganizer(Organizer organizer){
 
         jobs = organizer.getJobs();
@@ -87,6 +101,9 @@ class FrontendWorkflow{
         
         WorkflowManager();
     }
+    /*
+     * Prints the workflow information including tasks, stations, and job types.
+     */
     private void printWorkflowInfo(){
         System.out.println("---WORKFLOW INFO---");
         System.out.println();
@@ -115,6 +132,14 @@ class FrontendWorkflow{
             System.out.println();
         }
     }
+
+    /*
+     * This function iterates over the list of stations 
+     * to find those that can handle the given task. 
+     * Among the eligible stations, it selects the one 
+     * with the least number of tasks in its channel, 
+     * indicating it is the least busy.
+     */
     Station getTheFreeStationByTask(Task t){
         ArrayList<Station> usableStations = new ArrayList<>();
         for(Station s:stations){
@@ -147,6 +172,12 @@ class FrontendWorkflow{
         extractJobEventsFromJobList();
         HandleEvents();
     }
+    /*
+     * This function extracts tasks from a job and 
+     * schedules them in the appropriate stations, 
+     * creating and scheduling AddTaskEvent and 
+     * RemoveTaskEvent instances for each task.
+     */
     void extractJobEventsFromJobList(){
         Collections.sort(jobs, new JobComparator());        //Sort jobs according to their start date
         for(Job job : jobs){
@@ -176,7 +207,7 @@ class FrontendWorkflow{
             float multiCheck = s.checkMultiFlag(currentTask, freeStationChannel);
             if(multiCheck>0||startTime<multiCheck) {
                 startTime = multiCheck;
-                System.out.println(">>MultiCheck reorganized task's timetable.");
+                System.out.println(">>MultiCheck reorganized " +currentTask.getName() +  "'s timetable.");
             } 
             AddTaskEvent addTaskEvent = new AddTaskEvent(startTime,currentTask,s,freeStationChannel);
             RemoveTaskEvent removeTaskEvent = new RemoveTaskEvent(startTime + currentTask.getDuration(), currentTask, s, freeStationChannel);
@@ -200,7 +231,13 @@ class FrontendWorkflow{
     void EventAdder(EventTemplate event){
         eventTemplates.add(event);
     }
-    
+    /*
+     * This function processes all events in the eventTemplates 
+     * list in sequence. It handles different types of events 
+     * (AddTaskEvent, RemoveTaskEvent, QueueJobEvent, FinishJobEvent) 
+     * by executing the appropriate actions and updating the 
+     * state of the workflow accordingly.
+     */
     void HandleEvents(){
         DecimalFormat dF = new DecimalFormat("#.##");
         int queueCount = 0;
@@ -233,6 +270,8 @@ class FrontendWorkflow{
                     queueJobEvent.setDone(true);
                     break;
                 case "FinishJobEvent":
+                    FinishJobEvent finishJobEvent = (FinishJobEvent)currentEvent;
+                    System.out.println("Finish Job Event for: " + finishJobEvent.getJob().getName() + " at " + dF.format(finishJobEvent.getTime())+ ".");
                     break; 
             }
             Collections.sort(eventTemplates, new EventComparator());
@@ -294,6 +333,7 @@ class TaskComparator implements Comparator<Task> {          //Compare according 
         }
     }
 }
+
 class JobComparator implements Comparator<Job> {        //Sort jobs according to start time
     public int compare(Job job1, Job job2) {
         if(job1.getStartTime()==job2.getStartTime()){

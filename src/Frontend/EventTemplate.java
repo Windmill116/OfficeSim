@@ -213,6 +213,14 @@ class QueueJobEvent extends EventTemplate{
 class FinishJobEvent extends EventTemplate{
     Job job;
 
+    public Job getJob() {
+        return job;
+    }
+
+    public void setJob(Job job) {
+        this.job = job;
+    }
+
     FinishJobEvent(Job job, float time){
         this.job = job;
         this.time = time;
