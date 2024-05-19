@@ -280,14 +280,14 @@ class FrontendWorkflow{
 
             AddTaskEvent addTaskEvent = new AddTaskEvent(startTime,currentTask,s,freeStationChannel);
             RemoveTaskEvent removeTaskEvent = new RemoveTaskEvent(startTime + currentTask.getDuration(), currentTask, s, freeStationChannel);
-            System.out.println("For Task: " + currentTask.getName() + " added at station: " + s.getName() + " at time: " + startTime + " until: " + (startTime + currentTask.getDuration()));
+            System.out.println("For Task: " + currentTask.getName() + " added at station: " + s.getName()+ " at channel with" + addTaskEvent.getTargetChannel().toString() + " at time: " + startTime + " until: " + (startTime + currentTask.getDuration()));
             addTaskEvent.setJobOfTask(job);
             removeTaskEvent.setJobOfTask(job);
             s.getEvents().add(addTaskEvent);
             s.getEvents().add(removeTaskEvent);
             s.setDurationAddUpForUtilization(s.getDurationAddUpForUtilization() + currentTask.getDuration());
             job.getEventTemplates().add(removeTaskEvent);
-
+            addTaskEvent.getTargetChannel().add(currentTask);
             EventAdder(addTaskEvent);
             EventAdder(removeTaskEvent);
         }
@@ -312,18 +312,18 @@ class FrontendWorkflow{
             switch(currentEvent.getClass().getSimpleName()){
                 case "AddTaskEvent":
                     AddTaskEvent addTaskEvent = (AddTaskEvent)currentEvent;
-                    System.out.println("Add Task Event for: " + addTaskEvent.getTask().getName());
+                    System.out.println("Handle Events: \nAdd Task Event for: " + addTaskEvent.getTask().getName());
                     currentTask = addTaskEvent.getTask();
-                    addTaskEvent.getTargetChannel().add(currentTask);
+                    //addTaskEvent.getTargetChannel().add(currentTask);
                     addTaskEvent.getTargetStation().printWhatTasksAreExecuting();
-                    System.out.println("Task added to the " + addTaskEvent.getTargetStation().getName());
                     break;
                 case "RemoveTaskEvent":
                     RemoveTaskEvent removeTaskEvent = (RemoveTaskEvent) currentEvent;
-                    System.out.println("Remove task event for: " + removeTaskEvent.getTask().getName());
+                    System.out.println("Handle Events: \nRemove task event for: " + removeTaskEvent.getTask().getName());
                     currentTask = removeTaskEvent.getTask();
                     removeTaskEvent.getTargetChannel().remove(currentTask);
                     System.out.println("Task removed from: " + removeTaskEvent.getTargetStation().getName());
+                    removeTaskEvent.getTargetStation().printWhatTasksAreExecuting();
                     break;
                 case "QueueJobEvent":
                     System.out.println("QueueJobEvent");
@@ -341,7 +341,7 @@ class FrontendWorkflow{
             queueCount++;
         }
 
-        System.out.println();
+        System.out.println(EventTemplate.ANSI_GREEN+"\n<=============="+EventTemplate.ANSI_RED+ " RECAP" +EventTemplate.ANSI_GREEN+" =============>\n" + EventTemplate.ANSI_RESET);
         Collections.sort(eventTemplates, new EventComparator());
         for(EventTemplate e : eventTemplates){
             System.out.println(e.toString());
