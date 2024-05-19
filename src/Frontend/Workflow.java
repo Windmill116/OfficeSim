@@ -55,8 +55,9 @@ public class Workflow {
 
                 testFrontendWorkflow = new FrontendWorkflow(organizer);
                 
-            } catch (IOException e) {
+            } catch (Exception e) {
                 System.err.println("DEFINE OBJECTS LINE BY LINE DO NOT PUT OBJECTS IN SAME LINE");
+                System.err.println("PLEASE BE SURE YOU DEFINED TYPES IN JOBS,JOBTYPES AND STATIONS");
                 System.exit(0);
             }
         }

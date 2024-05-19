@@ -504,11 +504,22 @@ public class Organizer {
                      break;
                  }
              }// add other variables
-            jobArrayList.get(jobArrayList.size() - 1).setStartTime((float) Double.parseDouble(jobTokens.get(i)));
+             try {
+                 jobArrayList.get(jobArrayList.size() - 1).setStartTime((float) Double.parseDouble(jobTokens.get(i)));
+             } catch (Exception e) {
+                 error = true;
+                 System.out.println("**JOB FILE** "+ "Line " + line + ": You did not  defined start time");
+             }
             i++;
-            jobArrayList.get(jobArrayList.size() - 1).setDuration((float) Double.parseDouble(jobTokens.get(i)));
+             try {
+                 jobArrayList.get(jobArrayList.size() - 1).setDuration((float) Double.parseDouble(jobTokens.get(i)));
+             } catch (Exception e) {
+                 error = true;
+                 System.out.println("**JOB FILE** "+ "Line " + line + ": You did not  defined duration ");
+             }
          }  
       }
+      error(error,"jobfile");
   }
   private void jobFileErrorCheck() { // to check job file errors
     line = 1; // to reset the line
@@ -524,7 +535,7 @@ public class Organizer {
           }else
           { // if name of the job is not valid 
               error = true;
-              System.out.println("**WORKFLOW FILE** "+ "Line " + line + " Invalid job: \"" + jobTokens.get(i) + "\" Please change the name.");
+              System.out.println("**JOB FILE** "+ "Line " + line + " Invalid job: \"" + jobTokens.get(i) + "\" Please change the name.");
           }
         } else {
           error = true; 
@@ -533,10 +544,15 @@ public class Organizer {
         i++;
         Boolean check = false;
         for (JobType jobType : jobs) {
-          if (jobType.getName().equals(jobTokens.get(i))) {
+            try {
+                if (jobType.getName().equals(jobTokens.get(i))) {
             check = true;
             break;
           }
+            } catch (Exception e) {
+                error = true;
+                System.out.println("**JOB FILE** "+ "Line " + line + ": You did not define jobtype");
+            }
         }
         if (!check) {
           error = true;
