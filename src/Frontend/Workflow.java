@@ -258,6 +258,7 @@ class FrontendWorkflow{
                     RemoveTaskEvent removeTaskEvent = (RemoveTaskEvent) currentEvent;
                     System.out.println("Handle Events: \nRemove task event for: " + removeTaskEvent.getTask().getName());
                     currentTask = removeTaskEvent.getTask();
+                    removeTaskEvent.getTargetStation().printWhatTasksAreExecuting();
                     removeTaskEvent.getTargetChannel().remove(currentTask);
                     System.out.println("Task removed from: " + removeTaskEvent.getTargetStation().getName());
                     removeTaskEvent.getTargetStation().printWhatTasksAreExecuting();
