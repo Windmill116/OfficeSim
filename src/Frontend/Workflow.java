@@ -22,7 +22,7 @@ public class Workflow {
             //return;
         }
 
-        startMenu("test.txt","job.txt");
+        startMenu("dataProvided.txt","job.txt");
     }
 
     public static void startMenu(String workflowName, String jobName){
