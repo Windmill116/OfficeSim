@@ -137,6 +137,25 @@ public class Station {
         return allChannels.get(0);
     }
 
+    public float checkMultiFlag(Task task, ArrayList<Task> channel){
+        if(isMutliFlag()) return -1;
+        @SuppressWarnings("unchecked")
+        ArrayList<ArrayList<Task>> allChannels = (ArrayList<ArrayList<Task>>)taskChannels.clone();
+        allChannels.remove(channel);
+        float lastTime = -1;
+        for(ArrayList<Task> taskChannel : allChannels){
+            if(taskChannel.isEmpty()){
+                continue;
+            }
+            if(taskChannel.getFirst() == task){
+                for(EventTemplate et : events){
+                    if(lastTime<et.getTime()) lastTime = et.getTime();
+                }
+            }
+        }
+        return lastTime;
+    }
+
     public int getChannelCurrentDuration(ArrayList<Task> taskChannel){
         int currentDuration = 0;
         for(Task i : taskChannel){
