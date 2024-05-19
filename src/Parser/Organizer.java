@@ -409,6 +409,7 @@ public class Organizer {
                         
                     }
                 } // end of the code
+              ArrayList<Task> tmp3 = new ArrayList<>();
               for (Task task : tasks) { // this code check for task defined but not used in anywhere
                 boolean defined = false;
                 for (String string : tmpTask) {
@@ -423,10 +424,11 @@ public class Organizer {
                 }
                 if (!defined)
                 {
-                  error = true;
                   System.out.println("**WORKFLOW FILE** " + task.getName() + " is defined, but you did not use it. Be careful.");
+                  tmp3.add(task);
                 }
               }
+              tasks.removeAll(tmp3);
                 for (String token : tokens) {
                    if(token.equals("(")||token.equals(")"))  parantheses++;
                 }
