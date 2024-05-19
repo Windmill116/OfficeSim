@@ -92,6 +92,7 @@ class FrontendWorkflow{
     public void getArraysFromOrganizer(Organizer organizer){
 
         jobs = organizer.getJobs();
+        Collections.sort(jobs, new JobComparator());
 
         jobTypes = organizer.getJobTypes();
         
@@ -258,6 +259,7 @@ class FrontendWorkflow{
                     RemoveTaskEvent removeTaskEvent = (RemoveTaskEvent) currentEvent;
                     System.out.println("Handle Events: \nRemove task event for: " + removeTaskEvent.getTask().getName());
                     currentTask = removeTaskEvent.getTask();
+                    removeTaskEvent.getTargetStation().printWhatTasksAreExecuting();
                     removeTaskEvent.getTargetChannel().remove(currentTask);
                     System.out.println("Task removed from: " + removeTaskEvent.getTargetStation().getName());
                     removeTaskEvent.getTargetStation().printWhatTasksAreExecuting();
@@ -336,12 +338,14 @@ class TaskComparator implements Comparator<Task> {          //Compare according 
 
 class JobComparator implements Comparator<Job> {        //Sort jobs according to start time
     public int compare(Job job1, Job job2) {
-        if(job1.getStartTime()==job2.getStartTime()){
+        if(job1.getDuration()==job2.getDuration()){
             return 0;
-        }else if(job1.getStartTime()<job2.getStartTime()){
+        }else if(job1.getDuration()<job2.getDuration()  && job1.getStartTime()==job2.getStartTime()){
             return -1;
-        }else{
+        }else if(job1.getStartTime()==job2.getStartTime()){
             return 1;
+        }else{
+            return 0;
         }
     }
 }

@@ -197,7 +197,6 @@ public class Station {
         if(isAnyChannelEmpty&&doesAnyChannelHasTasks) System.out.println("Station is not running on full capacity.");
         else if(isAnyChannelEmpty&&!doesAnyChannelHasTasks) System.out.println("Station is idle.");
         else if(!isAnyChannelEmpty&&doesAnyChannelHasTasks) System.out.println("Station is running on full capacity.");
-        System.out.println();
     }
 }
 
