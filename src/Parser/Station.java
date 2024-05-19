@@ -163,11 +163,21 @@ public class Station {
     }
 
     public void printWhatTasksAreExecuting(){
-        System.out.print("\nFor " + this.name + " station running tasks are ");
-        for(ArrayList<Task> taskChannel : taskChannels){
-            if(taskChannel.size()==0)continue;
-            System.out.print(taskChannel.getLast().getName() + " ");
+        
+        System.out.print(name+" Station's running tasks are:");
+        int channel = 0;
+        boolean isAnyChannelEmpty = false;
+        boolean doesAnyChannelHasTasks = false;
+        for(ArrayList<Task> ar : taskChannels ){
+            System.out.print(" \nChannel " + ++channel + " " +ar);
+
+            if(ar.isEmpty()==false) doesAnyChannelHasTasks = true;
+            else{isAnyChannelEmpty=true;}
         }
+        System.out.println();
+        if(isAnyChannelEmpty&&doesAnyChannelHasTasks) System.out.println("Station is not running on full capacity.");
+        else if(isAnyChannelEmpty&&!doesAnyChannelHasTasks) System.out.println("Station is idle.");
+        else if(!isAnyChannelEmpty&&doesAnyChannelHasTasks) System.out.println("Station is running on full capacity.");
         System.out.println();
     }
 }
