@@ -86,7 +86,13 @@ public class Job {
 
     public void calculateJobTardiness(){
         jobFinishTime = getDuration() + getStartTime();
-        float lastEventTime = getEventTemplates().getLast().getTime();
+        float maxLastEventTime = 0;
+        for(EventTemplate ev : getEventTemplates()){
+            if(ev.getTime() > maxLastEventTime){
+                maxLastEventTime = ev.getTime();
+            }
+        }
+        float lastEventTime = maxLastEventTime;
         simulativeFinishTime = lastEventTime;
         jobTardiness = lastEventTime - jobFinishTime;
     }
