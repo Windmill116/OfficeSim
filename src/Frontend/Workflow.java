@@ -278,7 +278,10 @@ class FrontendWorkflow{
                 }else startTime = s.getEvents().getLast().getTime();
             }
             float multiCheck = s.checkMultiFlag(currentTask, freeStationChannel);
-            if(multiCheck>0||startTime<multiCheck) startTime = multiCheck; 
+            if(multiCheck>0||startTime<multiCheck) {
+                startTime = multiCheck;
+                System.out.println(">>MultiCheck reorganized task's timetable.");
+            } 
             AddTaskEvent addTaskEvent = new AddTaskEvent(startTime,currentTask,s,freeStationChannel);
             RemoveTaskEvent removeTaskEvent = new RemoveTaskEvent(startTime + currentTask.getDuration(), currentTask, s, freeStationChannel);
             System.out.println("For Task: " + currentTask.getName() + " added at station: " + s.getName()+ " at channel with" + addTaskEvent.getTargetChannel().toString() + " at time: " + startTime + " until: " + (startTime + currentTask.getDuration()));

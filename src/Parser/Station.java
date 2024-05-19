@@ -138,6 +138,7 @@ public class Station {
     }
 
     public float checkMultiFlag(Task task, ArrayList<Task> channel){
+        if(isMutliFlag()) return -1;
         @SuppressWarnings("unchecked")
         ArrayList<ArrayList<Task>> allChannels = (ArrayList<ArrayList<Task>>)taskChannels.clone();
         allChannels.remove(channel);
