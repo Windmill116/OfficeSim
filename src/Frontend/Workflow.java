@@ -28,14 +28,10 @@ public class Workflow {
     public static void startMenu(String workflowName, String jobName){
         Scanner s1=new Scanner(System.in);
 
-        System.out.println("Enter 'test' to start the program in test mode,\nEnter 'cancel' to end the program,\nEnter anything else to start the program in the normal mode.");
+        System.out.println("Enter 'cancel' to end the program,\nEnter anything else to start the program in the normal mode.");
         String s=s1.nextLine();
         s1.close();
-
-        if(s.toLowerCase().equals("test")){
-            FrontendWorkflow testFrontendWorkflow;
-            testFrontendWorkflow = new FrontendWorkflow();
-        } else if(s.toLowerCase().equals("cancel")){
+        if(s.toLowerCase().equals("cancel")){
             return;
         } else{
             FrontendWorkflow testFrontendWorkflow;
@@ -70,11 +66,6 @@ class FrontendWorkflow{
     private ArrayList<Station> stations;
     private ArrayList<Task> tasks;
 
-    ArrayList<tempJob> testJobs;
-    ArrayList<Task> testTasks;
-    ArrayList<JobType> testJobTypes;
-    ArrayList<Station> testStations;
-
     ArrayList<Object> eventList = new ArrayList<>();
 
     ArrayList<EventTemplate> eventTemplates = new ArrayList<EventTemplate>();
@@ -83,14 +74,6 @@ class FrontendWorkflow{
     public FrontendWorkflow(Organizer organizer){
         this.organizer = organizer;
         getArraysFromOrganizer(organizer);
-    }
-
-    public FrontendWorkflow(){      //This is for test mode
-        
-        createTestObjects();
-        assignTestObjectsAsMain();
-
-        WorkflowManager();
     }
     public void getArraysFromOrganizer(Organizer organizer){
 
@@ -101,8 +84,6 @@ class FrontendWorkflow{
         stations = organizer.getStations();
 
         tasks = organizer.getTasks();
-
-        System.out.println(tasks.get(0).getName());
         
         WorkflowManager();
     }
@@ -133,91 +114,6 @@ class FrontendWorkflow{
             System.out.println(job.toString());
             System.out.println();
         }
-    }
-    public void createTestObjects(){
-        /*Job1 J1 1 30
-        Job2 J1 2 29
-        Job3 J2 5 40
-        Job4 J2 7 35
-        Job5 J3 10 30 */
-
-        testTasks= new ArrayList<>();
-        testTasks.add(new Task("T1",10));
-        testTasks.add(new Task("T2",2));
-        testTasks.add(new Task("T3",2.5f));
-        testTasks.add(new Task("T5",4));
-        testTasks.add(new Task("T_1",5));
-        testTasks.add(new Task("T21", 5));
-
-        testJobTypes = new ArrayList<>();
-        JobType J1 = new JobType("J1");
-        ArrayList<Task> J1Tasks = new ArrayList<>();
-        J1Tasks.add(testTasks.get(0));
-        J1Tasks.add(testTasks.get(1));
-        J1Tasks.add(testTasks.get(2));
-        JobType J2 = new JobType("J2");
-        ArrayList<Task> J2Tasks = new ArrayList<>();
-        J2Tasks.add(testTasks.get(1));
-        J2Tasks.add(testTasks.get(2));
-        J2Tasks.add(testTasks.get(3));
-        JobType J3 = new JobType("J3");
-        ArrayList<Task> J3Tasks = new ArrayList<>();
-        J3Tasks.add(testTasks.get(3)); //change to 1
-
-        J1.setTasks(J1Tasks);
-        J2.setTasks(J2Tasks);
-        J3.setTasks(J3Tasks);
-
-        testJobTypes.add(J1);
-        testJobTypes.add(J2);
-        testJobTypes.add(J3);
-
-        testJobs = new ArrayList<>();
-        testJobs.add(new tempJob("Job1",J1,0,30));
-        testJobs.add(new tempJob("Job2",J1,2,29));
-        testJobs.add(new tempJob("Job3",J2,5,40));
-        testJobs.add(new tempJob("Job4",J2,7,35));
-        testJobs.add(new tempJob("Job5",J3,10,30));
-
-        testStations = new ArrayList<>();
-        testStations.add(new Station("S1",1,false,false,1,20));
-        testStations.add(new Station("S2",2,true,true,2,20));
-        testStations.add(new Station("S3",2,true,true,1.5f,20));
-
-        ArrayList<Task> testStation1Tasks = new ArrayList<>();
-        testStation1Tasks.add(testTasks.get(0));
-        testStation1Tasks.add(testTasks.get(1));
-        testStations.get(0).setDefaultTasks(testStation1Tasks);
-        ArrayList<Task> testStation2Tasks = new ArrayList<>();
-        testStation2Tasks.add(testTasks.get(0));
-        testStation2Tasks.add(testTasks.get(1));
-        testStations.get(1).setDefaultTasks(testStation2Tasks);
-        ArrayList<Task> testStation3Tasks = new ArrayList<>();
-        testStation3Tasks.add(testTasks.get(2));
-        testStation3Tasks.add(testTasks.get(3));
-        testStations.get(2).setDefaultTasks(testStation3Tasks);
-    }
-    public void assignTestObjectsAsMain(){
-        //jobs = testJobs;
-        tasks = testTasks;
-        stations = testStations;
-    }
-    Station getTheFreeStationByJob(tempJob j){
-        ArrayList<Station> usableStations = new ArrayList<>();
-        for(Station s:stations){
-            
-            boolean canUseStation=false;
-            for(Task task: j.getTasks()){
-                if(s.getDefaultTasks().contains(task)){
-                    canUseStation=true;
-                    break;
-                }
-            }
-            if(canUseStation){
-                usableStations.add(s);
-            }
-        }
-        return usableStations.get(0);
     }
     Station getTheFreeStationByTask(Task t){
         ArrayList<Station> usableStations = new ArrayList<>();
@@ -383,68 +279,6 @@ class FrontendWorkflow{
             }
         }
         return null;
-    }
-
-}
-
-class tempJob{
-    String name;
-    JobType jobType;
-    ArrayList<Task> tasks;
-    int startTime;
-    int duration;
-
-    public tempJob(String name,JobType jobType,int startTime,int duration){
-        this.name = name;
-        this.jobType = jobType; 
-        tasks = jobType.getTasks();
-        this.startTime = startTime;
-        this.duration = duration;
-    }
-
-    public Task getTask(int index){
-        return this.tasks.get(index);
-    }
-
-
-    public void addTask(Task t){
-        tasks.add(t);
-    }
-
-    public JobType getJobType() {
-        return jobType;
-    }
-
-    public void setJobType(JobType jobType) {
-        this.jobType = jobType;
-    }
-
-    public ArrayList<Task> getTasks() {
-        return tasks;
-    }
-
-    public void setTasks(ArrayList<Task> tasks) {
-        this.tasks = tasks;
-    }
-
-    public int getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(int startTime) {
-        this.startTime = startTime;
-    }
-
-    public int getDuration() {
-        return duration;
-    }
-
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
-
-    public String getName() {
-        return name;
     }
 
 }
