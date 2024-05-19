@@ -64,7 +64,6 @@ public class Task {
             Random random = new Random(System.nanoTime());
             Float num = value/(speed + random.nextFloat(1)*plusMinus);
             duration = num;
-            System.out.println(duration + " DURATION " +random.nextFloat(1));
         }else{
             duration = value/speed;
         }
